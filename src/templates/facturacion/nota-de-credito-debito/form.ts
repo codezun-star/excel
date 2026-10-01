@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 import { defineForm } from "@/templates/define";
-import { SECTION_CONTENT } from "@/templates/shared/fields";
 import {
+  SECTION_NUMBERING,
   businessFields,
   documentBaseDefaults,
   documentBaseShape,
@@ -18,34 +18,38 @@ import {
 export const configSchema = z.object({
   ...documentBaseShape,
   ...fiscalShape,
+  noteType: z.enum(["credito", "debito"]),
   defaultRate: z.enum(["standard", "special", "exempt", "exonerated"]),
-  exemptionFields: z.boolean(),
 });
 
-export type FacturaConfig = z.infer<typeof configSchema>;
+export type NotaConfig = z.infer<typeof configSchema>;
 
-export const form = defineForm<FacturaConfig>({
+export const form = defineForm<NotaConfig>({
   configSchema,
   defaultConfig: (ctx) => ({
     ...documentBaseDefaults(ctx),
     ...fiscalDefaults,
+    prefix: ctx.invoicing.documentPrefixes.creditNote,
+    noteType: "credito",
     defaultRate: "standard",
-    exemptionFields: false,
-    notes: "Gracias por su compra.",
   }),
   formFields: [
     ...businessFields(),
+    {
+      type: "select",
+      name: "noteType",
+      label: "Tipo de nota",
+      options: [
+        { value: "credito", label: "Nota de crédito (devoluciones, descuentos)" },
+        { value: "debito", label: "Nota de débito (cargos adicionales)" },
+      ],
+      section: SECTION_NUMBERING,
+      fullWidth: true,
+    },
     ...numberingFields(),
     ...fiscalFields(),
     ...linesFields(),
     rateField(),
-    {
-      type: "switch",
-      name: "exemptionFields",
-      label: "Campos para clientes exonerados",
-      description: "Orden de compra exenta, constancia de exonerado y registro SAG.",
-      section: SECTION_CONTENT,
-    },
     ...documentDesignFields(),
   ],
 });

@@ -186,6 +186,8 @@ export interface CountryContext {
     authorizationCodeDescription: string;
     numberFormatHint: string;
     defaultPrefix: string;
+    /** Prefijos sugeridos por tipo de documento fiscal */
+    documentPrefixes: { invoice: string; creditNote: string; debitNote: string; receipt: string };
     correlativeDigits: number;
     /** Leyendas que deben aparecer en el documento fiscal */
     legends: string[];

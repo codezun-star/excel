@@ -35,12 +35,19 @@ export interface DocumentBusiness {
   logo?: string | null;
 }
 
+export interface DocumentFormulaRefs {
+  /** Celda de la fecha del documento */
+  date: string;
+  /** Referencia a un parámetro de la hoja Parámetros */
+  param: (key: string) => string;
+}
+
 export interface DocumentExtraField {
   key: string;
   label: string;
   kind: "text" | "date" | "currency" | "integer";
   /** Fórmula opcional (p. ej. "Válida hasta" = fecha + días) */
-  formula?: (refs: { date: string }) => string;
+  formula?: (refs: DocumentFormulaRefs) => string;
   value?: string | number | null;
 }
 
@@ -390,7 +397,7 @@ export function addCommercialDocument(
   const rightFields: {
     label: string;
     kind: DocumentExtraField["kind"] | "payment" | "terms";
-    formula?: (r: { date: string }) => string;
+    formula?: (r: DocumentFormulaRefs) => string;
     value?: string | number | null;
   }[] = [];
   if (opts.showPaymentTerms) {
@@ -423,7 +430,7 @@ export function addCommercialDocument(
       const v = ws.getCell(r, docValueCol);
       const target = addr(docValueCol, r);
       if (right.formula) {
-        v.value = { formula: right.formula({ date: dateAddr }) };
+        v.value = { formula: right.formula({ date: dateAddr, param: params.ref }) };
         styleCalc(v, theme);
       } else {
         v.value = right.value ?? null;

@@ -1,4 +1,5 @@
 import { addCommercialDocument } from "@/lib/excel/document";
+import { columnsFrom, exampleLines } from "@/templates/shared/document-form";
 import { addInstructionsSheet } from "@/lib/excel/instructions";
 import { protectSheet } from "@/lib/excel/sheet";
 import { makeTheme } from "@/lib/excel/styles";
@@ -19,7 +20,6 @@ export const build: TemplateBuild<FacturaConfig> = async (
     ctx,
     options,
   });
-  const rate = (id: string) => ctx.taxes.salesTax.rates.find((r) => r.id === id)?.label ?? "";
 
   const doc = addCommercialDocument(wb, {
     sheetName: "Factura",
@@ -48,11 +48,7 @@ export const build: TemplateBuild<FacturaConfig> = async (
     },
     counterpartyLabel: "Cliente",
     lines: config.lines,
-    columns: {
-      code: config.optionalColumns.includes("code"),
-      discount: config.optionalColumns.includes("discount"),
-      unit: config.optionalColumns.includes("unit"),
-    },
+    columns: columnsFrom(config.optionalColumns),
     tax: { enabled: true, defaultRateId: config.defaultRate },
     paymentMethods: config.paymentMethods.length ? config.paymentMethods : ["Efectivo"],
     showPaymentTerms: true,
@@ -60,37 +56,7 @@ export const build: TemplateBuild<FacturaConfig> = async (
     exemptionFields: config.exemptionFields ? ctx.invoicing.exemptionFields : [],
     notes: config.notes,
     paper: config.paper,
-    example: config.example
-      ? [
-          {
-            code: "P-001",
-            desc: "Camisa polo bordada",
-            unit: "Unidad",
-            qty: 2,
-            price: 350,
-            disc: 20,
-            rate: rate("standard"),
-          },
-          {
-            code: "B-014",
-            desc: "Cerveza nacional (caja de 12)",
-            unit: "Caja",
-            qty: 1,
-            price: 520,
-            disc: 0,
-            rate: rate("special"),
-          },
-          {
-            code: "L-220",
-            desc: "Libro escolar",
-            unit: "Unidad",
-            qty: 3,
-            price: 180,
-            disc: 0,
-            rate: rate("exempt"),
-          },
-        ]
-      : undefined,
+    example: config.example ? exampleLines(ctx) : undefined,
   });
 
   await protectSheet(doc.ws);

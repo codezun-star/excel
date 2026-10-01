@@ -67,3 +67,18 @@ export function sheetRef(sheetName: string, address: string): string {
 export function formulaString(value: string): string {
   return `"${value.replace(/"/g, '""')}"`;
 }
+
+/** Desplaza una celda: offsetCell("C9", 1) → "D9"; conserva los "$". */
+export function offsetCell(cell: string, colOffset: number, rowOffset = 0): string {
+  const m = /^(\$?)([A-Z]+)(\$?)(\d+)$/.exec(cell);
+  if (!m) throw new Error(`Celda inválida: ${cell}`);
+  return `${m[1]}${colLetter(colNumber(m[2]!) + colOffset)}${m[3]}${Number(m[4]) + rowOffset}`;
+}
+
+/** Desplaza un rango "C9:C20" columnas a la derecha (o izquierda si es negativo). */
+export function offsetRange(range: string, colOffset: number, rowOffset = 0): string {
+  return range
+    .split(":")
+    .map((c) => offsetCell(c, colOffset, rowOffset))
+    .join(":");
+}

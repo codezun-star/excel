@@ -19,6 +19,21 @@ export interface InstructionsOptions {
   regulated?: "fiscal" | "laboral";
 }
 
+/** Hojas de apoyo que siempre van al final, antes de Instrucciones. */
+const SUPPORT_SHEETS = ["Parámetros", "Listas", "Letras"];
+
+/** Ordena el libro: hojas de trabajo primero (en orden de creación) y luego las de apoyo. */
+export function orderSupportSheets(wb: ExcelJS.Workbook): void {
+  // ExcelJS ordena las hojas por `orderNo` (no está en sus tipos públicos).
+  type Ordered = ExcelJS.Worksheet & { orderNo: number };
+  let n = 1;
+  for (const ws of wb.worksheets.filter((w) => !SUPPORT_SHEETS.includes(w.name))) (ws as Ordered).orderNo = n++;
+  for (const name of SUPPORT_SHEETS) {
+    const ws = wb.getWorksheet(name);
+    if (ws) (ws as Ordered).orderNo = n++;
+  }
+}
+
 export const LEGAL_DISCLAIMER =
   "Las plantillas fiscales y laborales son herramientas de apoyo y no sustituyen la asesoría de un contador o abogado. Verifica siempre los valores vigentes con las fuentes oficiales.";
 
@@ -28,6 +43,7 @@ export function addInstructionsSheet(
   opts: InstructionsOptions,
 ): ExcelJS.Worksheet {
   const { theme, ctx } = opts;
+  orderSupportSheets(wb);
   const ws = addSheet(wb, "Instrucciones", { tabColor: theme.highlight, showGridLines: false });
   ws.getColumn(1).width = 3;
   ws.getColumn(2).width = 6;

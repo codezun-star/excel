@@ -298,6 +298,13 @@ export const HN: CountryContext = {
     authorizationCodeDescription: "Código de Autorización de Impresión emitido por el SAR",
     numberFormatHint: "000-001-01-00000001 (establecimiento-punto de emisión-tipo-correlativo)",
     defaultPrefix: "000-001-01-",
+    // TODO: VERIFICAR VALOR VIGENTE (códigos de tipo de documento del régimen de facturación)
+    documentPrefixes: {
+      invoice: "000-001-01-",
+      creditNote: "000-001-04-",
+      debitNote: "000-001-05-",
+      receipt: "000-001-03-",
+    },
     correlativeDigits: 8,
     // TODO: VERIFICAR VALOR VIGENTE (Reglamento del Régimen de Facturación, SAR)
     legends: [
