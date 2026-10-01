@@ -27,7 +27,8 @@ export function orderSupportSheets(wb: ExcelJS.Workbook): void {
   // ExcelJS ordena las hojas por `orderNo` (no está en sus tipos públicos).
   type Ordered = ExcelJS.Worksheet & { orderNo: number };
   let n = 1;
-  for (const ws of wb.worksheets.filter((w) => !SUPPORT_SHEETS.includes(w.name))) (ws as Ordered).orderNo = n++;
+  for (const ws of wb.worksheets.filter((w) => !SUPPORT_SHEETS.includes(w.name)))
+    (ws as Ordered).orderNo = n++;
   for (const name of SUPPORT_SHEETS) {
     const ws = wb.getWorksheet(name);
     if (ws) (ws as Ordered).orderNo = n++;

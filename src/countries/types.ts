@@ -68,6 +68,11 @@ export interface IncomeTaxInfo {
   standardDeductions: { id: string; label: string; amount: number }[];
   fiscalYear: number;
   annualFilingDeadline: string;
+  /** Retención mensual en planilla */
+  withholding: {
+    /** Meses de salario que se proyectan para estimar la renta anual */
+    projectionMonths: number;
+  };
 }
 
 export interface SocialSecurityItem {
@@ -146,6 +151,8 @@ export interface LaborRules {
     /** Máximo de meses a pagar */
     maxMonths: number;
   };
+  /** Qué prestaciones corresponden según el motivo de terminación */
+  terminationReasons: { id: string; label: string; notice: boolean; severance: boolean }[];
   minimumWage: {
     agreement: string;
     effectiveFrom: string;

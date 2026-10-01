@@ -87,6 +87,9 @@ export const HN: CountryContext = {
         },
       ],
       annualFilingDeadline: "30 de abril", // TODO: VERIFICAR VALOR VIGENTE
+      withholding: {
+        projectionMonths: 12, // TODO: VERIFICAR VALOR VIGENTE (si la proyección incluye décimos)
+      },
     },
 
     socialSecurity: [
@@ -191,6 +194,24 @@ export const HN: CountryContext = {
       monthsPerYear: 1,
       maxMonths: 25,
     },
+    // TODO: VERIFICAR VALOR VIGENTE (Código de Trabajo, arts. 112-123)
+    terminationReasons: [
+      {
+        id: "despido-injustificado",
+        label: "Despido injustificado",
+        notice: true,
+        severance: true,
+      },
+      { id: "renuncia", label: "Renuncia voluntaria", notice: false, severance: false },
+      { id: "mutuo-acuerdo", label: "Mutuo acuerdo", notice: false, severance: false },
+      { id: "despido-justificado", label: "Despido justificado", notice: false, severance: false },
+      {
+        id: "fin-contrato",
+        label: "Fin de contrato por tiempo determinado",
+        notice: false,
+        severance: false,
+      },
+    ],
     minimumWage: {
       agreement: "Acuerdo Ejecutivo SETRASS-233-2026", // TODO: VERIFICAR VALOR VIGENTE
       effectiveFrom: "2026-01-01", // TODO: VERIFICAR VALOR VIGENTE

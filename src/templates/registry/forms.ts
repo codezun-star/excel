@@ -22,4 +22,17 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
     import("../facturacion/libro-de-ventas-y-compras/form").then((m) => m.form),
   "ventas-por-vendedor-comisiones": () =>
     import("../facturacion/ventas-por-vendedor-comisiones/form").then((m) => m.form),
+  "planilla-de-sueldos": () => import("../planilla/planilla-de-sueldos/form").then((m) => m.form),
+  "decimo-tercer-y-cuarto-mes": () =>
+    import("../planilla/decimo-tercer-y-cuarto-mes/form").then((m) => m.form),
+  "prestaciones-laborales": () =>
+    import("../planilla/prestaciones-laborales/form").then((m) => m.form),
+  "horas-extra": () => import("../planilla/horas-extra/form").then((m) => m.form),
+  "salario-minimo": () => import("../planilla/salario-minimo/form").then((m) => m.form),
+  "control-de-vacaciones": () =>
+    import("../planilla/control-de-vacaciones/form").then((m) => m.form),
+  "control-de-asistencia": () =>
+    import("../planilla/control-de-asistencia/form").then((m) => m.form),
+  "horarios-y-turnos": () => import("../planilla/horarios-y-turnos/form").then((m) => m.form),
+  "boleta-de-pago": () => import("../planilla/boleta-de-pago/form").then((m) => m.form),
 };

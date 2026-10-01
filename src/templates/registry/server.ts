@@ -20,6 +20,17 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
     import("../facturacion/libro-de-ventas-y-compras").then((m) => m.default),
   "ventas-por-vendedor-comisiones": () =>
     import("../facturacion/ventas-por-vendedor-comisiones").then((m) => m.default),
+  "planilla-de-sueldos": () => import("../planilla/planilla-de-sueldos").then((m) => m.default),
+  "decimo-tercer-y-cuarto-mes": () =>
+    import("../planilla/decimo-tercer-y-cuarto-mes").then((m) => m.default),
+  "prestaciones-laborales": () =>
+    import("../planilla/prestaciones-laborales").then((m) => m.default),
+  "horas-extra": () => import("../planilla/horas-extra").then((m) => m.default),
+  "salario-minimo": () => import("../planilla/salario-minimo").then((m) => m.default),
+  "control-de-vacaciones": () => import("../planilla/control-de-vacaciones").then((m) => m.default),
+  "control-de-asistencia": () => import("../planilla/control-de-asistencia").then((m) => m.default),
+  "horarios-y-turnos": () => import("../planilla/horarios-y-turnos").then((m) => m.default),
+  "boleta-de-pago": () => import("../planilla/boleta-de-pago").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

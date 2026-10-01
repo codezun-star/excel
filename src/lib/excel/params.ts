@@ -45,6 +45,10 @@ export interface ParamsRef {
   table: (key: string) => string;
   /** Rango de una columna (0-based) de una tabla de parámetros */
   tableColumn: (key: string, index: number) => string;
+  /** Celda absoluta (fila y columna 0-based) de una tabla de parámetros */
+  tableCell: (key: string, row: number, col: number) => string;
+  /** Número de filas de una tabla de parámetros */
+  tableRows: (key: string) => number;
 }
 
 /**
@@ -89,7 +93,15 @@ export function addParametersSheet(
   ws.getRow(3).height = 28;
 
   const refs = new Map<string, string>();
-  const tables = new Map<string, { range: string; col: (i: number) => string }>();
+  const tables = new Map<
+    string,
+    {
+      range: string;
+      col: (i: number) => string;
+      cell: (r: number, c: number) => string;
+      rows: number;
+    }
+  >();
   let row = 5;
 
   for (const section of opts.sections) {
@@ -145,6 +157,8 @@ export function addParametersSheet(
     tables.set(t.key, {
       range: sheetRef(ws.name, rangeAddr(2, first, 1 + t.columns.length, last, true)),
       col: (i) => sheetRef(ws.name, rangeAddr(2 + i, first, 2 + i, last, true)),
+      cell: (r, c) => sheetRef(ws.name, absAddr(2 + c, first + r)),
+      rows: t.rows.length,
     });
     if (t.note) {
       const n = ws.getCell(row, 2);
@@ -161,6 +175,12 @@ export function addParametersSheet(
   styleNote(sources, theme);
   ws.mergeCells(row, 2, row, 6);
 
+  const getTable = (key: string) => {
+    const t = tables.get(key);
+    if (!t) throw new Error(`Tabla de parámetros desconocida: ${key}`);
+    return t;
+  };
+
   return {
     ws,
     ref: (key) => {
@@ -168,16 +188,10 @@ export function addParametersSheet(
       if (!r) throw new Error(`Parámetro desconocido: ${key}`);
       return r;
     },
-    table: (key) => {
-      const t = tables.get(key);
-      if (!t) throw new Error(`Tabla de parámetros desconocida: ${key}`);
-      return t.range;
-    },
-    tableColumn: (key, index) => {
-      const t = tables.get(key);
-      if (!t) throw new Error(`Tabla de parámetros desconocida: ${key}`);
-      return t.col(index);
-    },
+    table: (key) => getTable(key).range,
+    tableColumn: (key, index) => getTable(key).col(index),
+    tableCell: (key, r, c) => getTable(key).cell(r, c),
+    tableRows: (key) => getTable(key).rows,
   };
 }
 

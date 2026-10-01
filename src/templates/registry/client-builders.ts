@@ -17,4 +17,8 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
   "estado-de-cuenta-cliente": () =>
     import("../facturacion/estado-de-cuenta-cliente/build").then((m) => m.build),
   "recibo-de-pago": () => import("../facturacion/recibo-de-pago/build").then((m) => m.build),
+  "salario-minimo": () => import("../planilla/salario-minimo/build").then((m) => m.build),
+  "control-de-asistencia": () =>
+    import("../planilla/control-de-asistencia/build").then((m) => m.build),
+  "horarios-y-turnos": () => import("../planilla/horarios-y-turnos/build").then((m) => m.build),
 };
