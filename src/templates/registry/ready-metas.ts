@@ -20,6 +20,17 @@ import { meta as controlDeVacaciones } from "../planilla/control-de-vacaciones/m
 import { meta as controlDeAsistencia } from "../planilla/control-de-asistencia/meta";
 import { meta as horariosYTurnos } from "../planilla/horarios-y-turnos/meta";
 import { meta as boletaDePago } from "../planilla/boleta-de-pago/meta";
+import { meta as declaracionMensualIsv } from "../impuestos/declaracion-mensual-isv/meta";
+import { meta as isrPersonasNaturales } from "../impuestos/isr-personas-naturales/meta";
+import { meta as calendarioTributario } from "../impuestos/calendario-tributario/meta";
+import { meta as flujoDeCaja } from "../impuestos/flujo-de-caja/meta";
+import { meta as catalogoDeCuentas } from "../impuestos/catalogo-de-cuentas/meta";
+import { meta as conciliacionBancaria } from "../impuestos/conciliacion-bancaria/meta";
+import { meta as puntoDeEquilibrio } from "../impuestos/punto-de-equilibrio/meta";
+import { meta as libroDiarioMayor } from "../impuestos/libro-diario-mayor/meta";
+import { meta as activosFijosDepreciacion } from "../impuestos/activos-fijos-depreciacion/meta";
+import { meta as estadoDeResultadosBalance } from "../impuestos/estado-de-resultados-balance/meta";
+import { meta as presupuestoAnual } from "../impuestos/presupuesto-anual/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -50,4 +61,15 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   controlDeAsistencia,
   horariosYTurnos,
   boletaDePago,
+  declaracionMensualIsv,
+  isrPersonasNaturales,
+  calendarioTributario,
+  flujoDeCaja,
+  catalogoDeCuentas,
+  conciliacionBancaria,
+  puntoDeEquilibrio,
+  libroDiarioMayor,
+  activosFijosDepreciacion,
+  estadoDeResultadosBalance,
+  presupuestoAnual,
 ];

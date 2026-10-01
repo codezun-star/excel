@@ -11,23 +11,6 @@ export const COMING_SOON: TemplateMeta[] = [
 
   // ---------------------------------------------------------------- Impuestos
   comingSoon("impuestos", {
-    slug: "declaracion-mensual-isv",
-    title: "Declaración mensual del ISV",
-    shortDescription:
-      "Hoja de trabajo para calcular débito y crédito fiscal y el ISV a pagar del mes.",
-    tier: "pro",
-    regulated: "fiscal",
-    countries: ["HN"],
-  }),
-  comingSoon("impuestos", {
-    slug: "isr-personas-naturales",
-    title: "ISR de personas naturales",
-    shortDescription: "Cálculo anual y retención mensual del ISR con la tabla progresiva vigente.",
-    tier: "pro",
-    regulated: "fiscal",
-    countries: ["HN"],
-  }),
-  comingSoon("impuestos", {
     slug: "control-de-retenciones",
     title: "Control de retenciones",
     shortDescription:
@@ -44,69 +27,6 @@ export const COMING_SOON: TemplateMeta[] = [
     tier: "pro",
     regulated: "fiscal",
     countries: ["HN"],
-  }),
-  comingSoon("impuestos", {
-    slug: "calendario-tributario",
-    title: "Calendario tributario",
-    shortDescription: "Fechas de vencimiento de declaraciones y pagos del año con recordatorios.",
-    tier: "pro",
-    regulated: "fiscal",
-    countries: ["HN"],
-  }),
-  comingSoon("impuestos", {
-    slug: "flujo-de-caja",
-    title: "Flujo de caja",
-    shortDescription: "Proyección de entradas y salidas de efectivo por mes con saldo acumulado.",
-    tier: "free",
-    businessTypes: [...ALL_SHOPS, "servicios", "constructora", "agro"],
-  }),
-  comingSoon("impuestos", {
-    slug: "estado-de-resultados-balance",
-    title: "Estado de resultados y balance general",
-    shortDescription: "Estados financieros básicos con márgenes e indicadores calculados.",
-    tier: "pro",
-    regulated: "fiscal",
-  }),
-  comingSoon("impuestos", {
-    slug: "libro-diario-mayor",
-    title: "Libro diario y mayor",
-    shortDescription:
-      "Partidas contables con validación de cuadre y mayorización automática por cuenta.",
-    tier: "pro",
-    regulated: "fiscal",
-  }),
-  comingSoon("impuestos", {
-    slug: "conciliacion-bancaria",
-    title: "Conciliación bancaria",
-    shortDescription:
-      "Concilia el saldo del banco con tus libros: depósitos en tránsito y cheques pendientes.",
-    tier: "free",
-  }),
-  comingSoon("impuestos", {
-    slug: "catalogo-de-cuentas",
-    title: "Catálogo de cuentas",
-    shortDescription: "Catálogo contable base para pequeñas empresas, editable y con niveles.",
-    tier: "free",
-  }),
-  comingSoon("impuestos", {
-    slug: "activos-fijos-depreciacion",
-    title: "Activos fijos y depreciación",
-    shortDescription: "Registro de activos con depreciación en línea recta mensual y acumulada.",
-    tier: "pro",
-    regulated: "fiscal",
-  }),
-  comingSoon("impuestos", {
-    slug: "presupuesto-anual",
-    title: "Presupuesto anual",
-    shortDescription: "Presupuesto de ingresos y gastos por mes comparado contra lo real.",
-    tier: "free",
-  }),
-  comingSoon("impuestos", {
-    slug: "punto-de-equilibrio",
-    title: "Punto de equilibrio",
-    shortDescription: "Calcula cuántas unidades o ventas necesitas para cubrir tus costos.",
-    tier: "free",
-    businessTypes: [...ALL_SHOPS, "servicios"],
   }),
 
   // ---------------------------------------------------------------- Planilla

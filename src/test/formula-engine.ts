@@ -19,13 +19,14 @@ function cellToRaw(cell: ExcelJS.Cell): RawCellContent {
   const v = cell.value;
   if (v === null || v === undefined) return null;
   if (typeof v === "number" || typeof v === "boolean") return v;
-  if (typeof v === "string") return v.startsWith("=") ? `'${v}` : v;
+  // El apóstrofo inicial conserva el texto como texto (igual que una celda de texto en Excel).
+  if (typeof v === "string") return `'${v}`;
   if (v instanceof Date) return toSerial(v);
   if (typeof v === "object") {
     if ("formula" in v && typeof v.formula === "string") return `=${v.formula}`;
     if ("sharedFormula" in v) throw new Error("Las plantillas no deben usar fórmulas compartidas");
-    if ("richText" in v) return v.richText.map((t) => t.text).join("");
-    if ("text" in v && typeof v.text === "string") return v.text;
+    if ("richText" in v) return `'${v.richText.map((t) => t.text).join("")}`;
+    if ("text" in v && typeof v.text === "string") return `'${v.text}`;
     if ("error" in v) return v.error;
   }
   return null;

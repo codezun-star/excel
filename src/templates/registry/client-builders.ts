@@ -21,4 +21,12 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
   "control-de-asistencia": () =>
     import("../planilla/control-de-asistencia/build").then((m) => m.build),
   "horarios-y-turnos": () => import("../planilla/horarios-y-turnos/build").then((m) => m.build),
+  "flujo-de-caja": () => import("../impuestos/flujo-de-caja/build").then((m) => m.build),
+  "catalogo-de-cuentas": () =>
+    import("../impuestos/catalogo-de-cuentas/build").then((m) => m.build),
+  "conciliacion-bancaria": () =>
+    import("../impuestos/conciliacion-bancaria/build").then((m) => m.build),
+  "punto-de-equilibrio": () =>
+    import("../impuestos/punto-de-equilibrio/build").then((m) => m.build),
+  "presupuesto-anual": () => import("../impuestos/presupuesto-anual/build").then((m) => m.build),
 };

@@ -35,4 +35,21 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
     import("../planilla/control-de-asistencia/form").then((m) => m.form),
   "horarios-y-turnos": () => import("../planilla/horarios-y-turnos/form").then((m) => m.form),
   "boleta-de-pago": () => import("../planilla/boleta-de-pago/form").then((m) => m.form),
+  "declaracion-mensual-isv": () =>
+    import("../impuestos/declaracion-mensual-isv/form").then((m) => m.form),
+  "isr-personas-naturales": () =>
+    import("../impuestos/isr-personas-naturales/form").then((m) => m.form),
+  "calendario-tributario": () =>
+    import("../impuestos/calendario-tributario/form").then((m) => m.form),
+  "flujo-de-caja": () => import("../impuestos/flujo-de-caja/form").then((m) => m.form),
+  "catalogo-de-cuentas": () => import("../impuestos/catalogo-de-cuentas/form").then((m) => m.form),
+  "conciliacion-bancaria": () =>
+    import("../impuestos/conciliacion-bancaria/form").then((m) => m.form),
+  "punto-de-equilibrio": () => import("../impuestos/punto-de-equilibrio/form").then((m) => m.form),
+  "libro-diario-mayor": () => import("../impuestos/libro-diario-mayor/form").then((m) => m.form),
+  "activos-fijos-depreciacion": () =>
+    import("../impuestos/activos-fijos-depreciacion/form").then((m) => m.form),
+  "estado-de-resultados-balance": () =>
+    import("../impuestos/estado-de-resultados-balance/form").then((m) => m.form),
+  "presupuesto-anual": () => import("../impuestos/presupuesto-anual/form").then((m) => m.form),
 };

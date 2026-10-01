@@ -70,7 +70,12 @@ function tableRow(
   ws.eachRow((row, n) => {
     row.eachCell((cell) => {
       if (!headerRow && cell.value === headerLabel) headerRow = n;
-      if (headerRow && n > headerRow && !keyRow && cell.value === rowKey) keyRow = n;
+      if (headerRow && n > headerRow && !keyRow) {
+        const v = cell.value;
+        const shown =
+          v && typeof v === "object" && "formula" in v ? ev.value(sheet, cell.address) : v;
+        if (shown === rowKey) keyRow = n;
+      }
     });
   });
   if (!headerRow || !keyRow) throw new Error(`No se encontró la fila "${rowKey}" en ${sheet}`);
@@ -233,5 +238,97 @@ describe("cálculos de plantillas con datos de ejemplo", () => {
       12880.89,
       2,
     );
+  });
+
+  it("declaracion-mensual-isv: débito, crédito e ISV a pagar", async () => {
+    const { wb, ev } = await buildExample("declaracion-mensual-isv");
+    const v = (l: string) => valueRightOf(wb, ev, "Declaración ISV", l);
+    expect(v("Total débito fiscal")).toBeCloseTo(34860, 2);
+    expect(v("Total crédito fiscal")).toBeCloseTo(22680, 2);
+    expect(v("ISV A PAGAR")).toBeCloseTo(10080, 2);
+  });
+
+  it("isr-personas-naturales: impuesto anual por tramos", async () => {
+    const { wb, ev } = await buildExample("isr-personas-naturales");
+    const v = (l: string) => valueRightOf(wb, ev, "Cálculo ISR", l);
+    // Renta neta = 620 000 − 40 000 exentos − 40 000 gastos médicos = 540 000
+    expect(v("Renta neta gravable")).toBe(540000);
+    // 15 % × 119 829.78 + 20 % × (540 000 − 348 154.10) = 17 974.47 + 38 369.18
+    expect(v("Impuesto anual según tabla progresiva")).toBeCloseTo(56343.65, 2);
+    expect(v("IMPUESTO A PAGAR")).toBeCloseTo(52843.65, 2);
+  });
+
+  it("flujo-de-caja: saldo final acumulado de 12 meses", async () => {
+    const { wb, ev } = await buildExample("flujo-de-caja");
+    // Neto mensual = 75 000 − 64 500 = 10 500; saldo final = 25 000 + 12 × 10 500
+    expect(valueRightOf(wb, ev, "Flujo de caja", "Saldo final")).toBe(35500);
+    const ws = wb.getWorksheet("Flujo de caja")!;
+    let total: unknown;
+    ws.eachRow((row) =>
+      row.eachCell((c) => {
+        if (c.value === "Saldo final")
+          total = ev.value("Flujo de caja", ws.getCell(Number(c.row), 14).address);
+      }),
+    );
+    expect(total).toBe(151000);
+  });
+
+  it("conciliacion-bancaria: saldos conciliados", async () => {
+    const { wb, ev } = await buildExample("conciliacion-bancaria");
+    expect(valueRightOf(wb, ev, "Conciliación", "Saldo del banco conciliado")).toBe(146230);
+    expect(valueRightOf(wb, ev, "Conciliación", "Estado")).toBe("Conciliado");
+  });
+
+  it("punto-de-equilibrio: unidades y ventas", async () => {
+    const { wb, ev } = await buildExample("punto-de-equilibrio");
+    // Costos fijos 40 000; margen 50 → 800 unidades; 96 000 en ventas
+    expect(
+      valueRightOf(wb, ev, "Punto de equilibrio", "Punto de equilibrio (unidades al mes)"),
+    ).toBe(800);
+    expect(
+      valueRightOf(wb, ev, "Punto de equilibrio", "Punto de equilibrio (ventas al mes)"),
+    ).toBeCloseTo(96000, 2);
+    expect(valueRightOf(wb, ev, "Punto de equilibrio", "Unidades para la utilidad deseada")).toBe(
+      1200,
+    );
+  });
+
+  it("catalogo-de-cuentas: tipo y naturaleza desde el código", async () => {
+    const { wb, ev } = await buildExample("catalogo-de-cuentas");
+    const row = tableRow(wb, ev, "Catálogo", "Código", "2103");
+    expect(row["Tipo"]).toBe("Pasivo");
+    expect(row["Naturaleza"]).toBe("Acreedora");
+    expect(row["Nivel"]).toBe(3);
+  });
+
+  it("libro-diario-mayor: partidas cuadradas y saldos del mayor", async () => {
+    const { wb, ev } = await buildExample("libro-diario-mayor");
+    expect(valueRightOf(wb, ev, "Mayor y balanza", "Balanza")).toBe("Cuadrada");
+    const bancos = tableRow(wb, ev, "Mayor y balanza", "Código", "1103");
+    expect(bancos["Saldo deudor"]).toBe(54000);
+    const ventas = tableRow(wb, ev, "Mayor y balanza", "Código", "4101");
+    expect(ventas["Saldo acreedor"]).toBe(30000);
+  });
+
+  it("activos-fijos-depreciacion: acumulada y valor en libros", async () => {
+    const { wb, ev } = await buildExample("activos-fijos-depreciacion");
+    // Pickup: (720 000 − 120 000) / 5 años / 12 = 10 000 al mes; jun año−2 → dic año = 30 meses
+    const pickup = tableRow(wb, ev, "Activos", "Código", "VEH-01");
+    expect(pickup["Meses depreciados"]).toBe(30);
+    expect(pickup["Depreciación acumulada"]).toBe(300000);
+    expect(pickup["Valor en libros"]).toBe(420000);
+  });
+
+  it("estado-de-resultados-balance: utilidad neta y balance cuadrado", async () => {
+    const { wb, ev } = await buildExample("estado-de-resultados-balance");
+    expect(valueRightOf(wb, ev, "Estado de resultados", "UTILIDAD NETA")).toBe(184000);
+    expect(valueRightOf(wb, ev, "Balance general", "TOTAL ACTIVO")).toBe(1102000);
+    expect(valueRightOf(wb, ev, "Balance general", "Diferencia (debe ser cero)")).toBe(0);
+  });
+
+  it("presupuesto-anual: real del mes desde los movimientos", async () => {
+    const { wb, ev } = await buildExample("presupuesto-anual");
+    expect(valueRightOf(wb, ev, "Comparación", "Total ingresos reales")).toBe(112000);
+    expect(valueRightOf(wb, ev, "Comparación", "Total gastos reales")).toBe(81000);
   });
 });

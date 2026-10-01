@@ -31,6 +31,23 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
   "control-de-asistencia": () => import("../planilla/control-de-asistencia").then((m) => m.default),
   "horarios-y-turnos": () => import("../planilla/horarios-y-turnos").then((m) => m.default),
   "boleta-de-pago": () => import("../planilla/boleta-de-pago").then((m) => m.default),
+  "declaracion-mensual-isv": () =>
+    import("../impuestos/declaracion-mensual-isv").then((m) => m.default),
+  "isr-personas-naturales": () =>
+    import("../impuestos/isr-personas-naturales").then((m) => m.default),
+  "calendario-tributario": () =>
+    import("../impuestos/calendario-tributario").then((m) => m.default),
+  "flujo-de-caja": () => import("../impuestos/flujo-de-caja").then((m) => m.default),
+  "catalogo-de-cuentas": () => import("../impuestos/catalogo-de-cuentas").then((m) => m.default),
+  "conciliacion-bancaria": () =>
+    import("../impuestos/conciliacion-bancaria").then((m) => m.default),
+  "punto-de-equilibrio": () => import("../impuestos/punto-de-equilibrio").then((m) => m.default),
+  "libro-diario-mayor": () => import("../impuestos/libro-diario-mayor").then((m) => m.default),
+  "activos-fijos-depreciacion": () =>
+    import("../impuestos/activos-fijos-depreciacion").then((m) => m.default),
+  "estado-de-resultados-balance": () =>
+    import("../impuestos/estado-de-resultados-balance").then((m) => m.default),
+  "presupuesto-anual": () => import("../impuestos/presupuesto-anual").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

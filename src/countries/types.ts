@@ -68,6 +68,8 @@ export interface IncomeTaxInfo {
   standardDeductions: { id: string; label: string; amount: number }[];
   fiscalYear: number;
   annualFilingDeadline: string;
+  /** Vencimiento de la declaración anual (mes y día del año siguiente) */
+  annualFilingDue: { month: number; day: number };
   /** Retención mensual en planilla */
   withholding: {
     /** Meses de salario que se proyectan para estimar la renta anual */
@@ -181,6 +183,8 @@ export interface CountryContext {
   taxId: TaxIdInfo;
   taxes: {
     salesTax: SalesTaxInfo;
+    /** Vida útil fiscal sugerida por tipo de activo (depreciación en línea recta) */
+    depreciation: { category: string; usefulLifeYears: number }[];
     incomeTax: IncomeTaxInfo;
     socialSecurity: SocialSecurityItem[];
     /** Aportes patronales adicionales (INFOP, reserva laboral, etc.) */

@@ -42,6 +42,15 @@ export const HN: CountryContext = {
   },
 
   taxes: {
+    // TODO: VERIFICAR VALOR VIGENTE — vidas útiles de referencia; confirmar con el reglamento de la Ley del ISR.
+    depreciation: [
+      { category: "Edificios e instalaciones", usefulLifeYears: 20 },
+      { category: "Maquinaria y equipo", usefulLifeYears: 10 },
+      { category: "Mobiliario y equipo de oficina", usefulLifeYears: 10 },
+      { category: "Vehículos", usefulLifeYears: 5 },
+      { category: "Equipo de cómputo", usefulLifeYears: 3 },
+      { category: "Herramientas", usefulLifeYears: 4 },
+    ],
     salesTax: {
       name: "ISV",
       longName: "Impuesto Sobre Ventas",
@@ -87,6 +96,7 @@ export const HN: CountryContext = {
         },
       ],
       annualFilingDeadline: "30 de abril", // TODO: VERIFICAR VALOR VIGENTE
+      annualFilingDue: { month: 4, day: 30 }, // TODO: VERIFICAR VALOR VIGENTE
       withholding: {
         projectionMonths: 12, // TODO: VERIFICAR VALOR VIGENTE (si la proyección incluye décimos)
       },
