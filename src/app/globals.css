@@ -1,0 +1,175 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Tokens de diseño de Excel Codezun.
+ * Los colores de marca se definen una sola vez aquí y se exponen a Tailwind
+ * mediante @theme inline (bg-primary, text-brand-strong, bg-highlight, etc.).
+ */
+:root {
+  /* Marca */
+  --brand: #217346; /* Verde Excel principal */
+  --brand-strong: #185c37; /* Hover y textos fuertes */
+  --brand-soft: #e8f3ec; /* Fondos de sección */
+  --highlight: #f2b01e; /* Ámbar de acento: Pro, acciones secundarias */
+  --highlight-strong: #d99a0b;
+  --highlight-foreground: #2b2105;
+
+  /* Neutros */
+  --background: #ffffff;
+  --foreground: #1b2420;
+  --card: #ffffff;
+  --card-foreground: #1b2420;
+  --popover: #ffffff;
+  --popover-foreground: #1b2420;
+  --primary: var(--brand);
+  --primary-hover: var(--brand-strong);
+  --primary-foreground: #ffffff;
+  --secondary: #f2f5f3;
+  --secondary-foreground: #1b2420;
+  --muted: #f4f6f5;
+  --muted-foreground: #5b6762;
+  --accent: var(--brand-soft);
+  --accent-foreground: var(--brand-strong);
+  --destructive: #c62828;
+  --destructive-foreground: #ffffff;
+  --success: var(--brand);
+  --border: #dde3e0;
+  --input: #cfd7d3;
+  --ring: #217346;
+  --grid-line: rgba(33, 115, 70, 0.08);
+  --cell-header: #f3f6f4;
+  --radius: 0.625rem;
+}
+
+.dark {
+  --brand: #2f9a5e;
+  --brand-strong: #6fd19a;
+  --brand-soft: #14271c;
+  --highlight: #f2b01e;
+  --highlight-strong: #f6c650;
+  --highlight-foreground: #2b2105;
+
+  --background: #0d1511;
+  --foreground: #e6efe9;
+  --card: #121c17;
+  --card-foreground: #e6efe9;
+  --popover: #121c17;
+  --popover-foreground: #e6efe9;
+  --primary: #2a8b55;
+  --primary-hover: #33a064;
+  --primary-foreground: #ffffff;
+  --secondary: #1a2620;
+  --secondary-foreground: #e6efe9;
+  --muted: #17221c;
+  --muted-foreground: #9db0a5;
+  --accent: #1a2e22;
+  --accent-foreground: #b9e8cb;
+  --destructive: #ef5350;
+  --destructive-foreground: #ffffff;
+  --border: #25352c;
+  --input: #2d4035;
+  --ring: #4cc283;
+  --grid-line: rgba(111, 209, 154, 0.07);
+  --cell-header: #16211b;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-highlight: var(--highlight);
+  --color-highlight-strong: var(--highlight-strong);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-cell-header: var(--cell-header);
+  --color-grid-line: var(--grid-line);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading tracking-tight;
+  }
+
+  /* Foco visible y consistente para navegación con teclado */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  table {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+@layer components {
+  /* Cuadrícula sutil tipo hoja de cálculo para fondos (hero, secciones) */
+  .bg-sheet-grid {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size:
+      88px 28px,
+      88px 28px;
+  }
+
+  /* Etiqueta con estilo de encabezado de celda (A, B, C… / 1, 2, 3…) */
+  .cell-label {
+    @apply inline-flex items-center justify-center border border-border bg-cell-header font-mono text-[11px] tracking-wide text-muted-foreground uppercase;
+  }
+
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+}
