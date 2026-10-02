@@ -1,4 +1,4 @@
-import { ALL_EMPLOYERS, ALL_SHOPS } from "./categories";
+import { ALL_EMPLOYERS } from "./categories";
 import { comingSoon } from "./define";
 import type { TemplateMeta } from "./types";
 
