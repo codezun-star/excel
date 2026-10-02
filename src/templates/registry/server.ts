@@ -108,6 +108,20 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
   "presupuesto-de-bodas-eventos": () =>
     import("../finanzas-personales/presupuesto-de-bodas-eventos").then((m) => m.default),
   "lista-del-super": () => import("../finanzas-personales/lista-del-super").then((m) => m.default),
+  "contabilidad-de-iglesias": () =>
+    import("../comunidad/contabilidad-de-iglesias").then((m) => m.default),
+  "rifas-y-colectas": () => import("../comunidad/rifas-y-colectas").then((m) => m.default),
+  "aportes-asociaciones": () => import("../comunidad/aportes-asociaciones").then((m) => m.default),
+  "administracion-de-condominios": () =>
+    import("../comunidad/administracion-de-condominios").then((m) => m.default),
+  "contrato-de-arrendamiento": () =>
+    import("../bienes-raices/contrato-de-arrendamiento").then((m) => m.default),
+  "gastos-de-propiedades": () =>
+    import("../bienes-raices/gastos-de-propiedades").then((m) => m.default),
+  "rentabilidad-inmobiliaria": () =>
+    import("../bienes-raices/rentabilidad-inmobiliaria").then((m) => m.default),
+  "ventas-de-lotes-a-plazos": () =>
+    import("../bienes-raices/ventas-de-lotes-a-plazos").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

@@ -115,4 +115,19 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
     import("../finanzas-personales/presupuesto-de-bodas-eventos/form").then((m) => m.form),
   "lista-del-super": () =>
     import("../finanzas-personales/lista-del-super/form").then((m) => m.form),
+  "contabilidad-de-iglesias": () =>
+    import("../comunidad/contabilidad-de-iglesias/form").then((m) => m.form),
+  "rifas-y-colectas": () => import("../comunidad/rifas-y-colectas/form").then((m) => m.form),
+  "aportes-asociaciones": () =>
+    import("../comunidad/aportes-asociaciones/form").then((m) => m.form),
+  "administracion-de-condominios": () =>
+    import("../comunidad/administracion-de-condominios/form").then((m) => m.form),
+  "contrato-de-arrendamiento": () =>
+    import("../bienes-raices/contrato-de-arrendamiento/form").then((m) => m.form),
+  "gastos-de-propiedades": () =>
+    import("../bienes-raices/gastos-de-propiedades/form").then((m) => m.form),
+  "rentabilidad-inmobiliaria": () =>
+    import("../bienes-raices/rentabilidad-inmobiliaria/form").then((m) => m.form),
+  "ventas-de-lotes-a-plazos": () =>
+    import("../bienes-raices/ventas-de-lotes-a-plazos/form").then((m) => m.form),
 };

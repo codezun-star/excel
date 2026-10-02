@@ -1,6 +1,50 @@
+import type ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 
+import type { EvaluatedWorkbook } from "@/test/formula-engine";
 import { buildExample, tableRow, valueRightOf } from "@/test/template-helpers";
+
+/** Primeros `count` valores calculados debajo del encabezado indicado. */
+function columnBelow(
+  wb: ExcelJS.Workbook,
+  ev: EvaluatedWorkbook,
+  sheet: string,
+  header: string,
+  count: number,
+): unknown[] {
+  const ws = wb.getWorksheet(sheet)!;
+  let at: ExcelJS.Cell | null = null;
+  ws.eachRow((row) =>
+    row.eachCell((cell) => {
+      if (!at && cell.value === header) at = cell;
+    }),
+  );
+  if (!at) throw new Error(`No se encontró "${header}" en ${sheet}`);
+  const { row, col } = at as ExcelJS.Cell;
+  return Array.from({ length: count }, (_, i) =>
+    ev.value(sheet, ws.getCell(Number(row) + 1 + i, Number(col)).address),
+  );
+}
+
+/** Texto calculado de la primera celda de la columna A que empieza con `prefix`. */
+function paragraphStarting(
+  wb: ExcelJS.Workbook,
+  ev: EvaluatedWorkbook,
+  sheet: string,
+  prefix: string,
+): string {
+  const ws = wb.getWorksheet(sheet)!;
+  for (let r = 1; r <= ws.rowCount; r++) {
+    const v = ev.value(sheet, `A${r}`);
+    if (typeof v === "string" && v.startsWith(prefix)) return v;
+  }
+  throw new Error(`No se encontró un párrafo que empiece con "${prefix}"`);
+}
+
+const pmt = (principal: number, monthlyRate: number, months: number) =>
+  monthlyRate === 0
+    ? principal / months
+    : (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -months));
 
 /** Resultados clave de las plantillas agregadas después de la primera versión. */
 describe("cálculos de plantillas (segunda ola)", () => {
@@ -327,5 +371,209 @@ describe("cálculos de plantillas (segunda ola)", () => {
     expect(valueRightOf(wb, ev, "Lista", "Gastado hasta ahora")).toBe(160);
     expect(valueRightOf(wb, ev, "Lista", "Te queda del presupuesto")).toBe(3840);
     expect(valueRightOf(wb, ev, "Lista", "Productos por comprar")).toBe(1);
+  });
+
+  it("contabilidad-de-iglesias: saldo mensual, categorías y aportes por miembro", async () => {
+    const { wb, ev } = await buildExample("contabilidad-de-iglesias");
+    expect(tableRow(wb, ev, "Informe", "Mes", "Enero")).toMatchObject({
+      Ingresos: 3850,
+      Egresos: 1800,
+      Resultado: 2050,
+      "Saldo en caja": 2050,
+    });
+    expect(tableRow(wb, ev, "Informe", "Mes", "Febrero")).toMatchObject({ "Saldo en caja": 1750 });
+    expect(tableRow(wb, ev, "Informe", "Ingresos por categoría", "Diezmos")).toMatchObject({
+      "Total del año": 2400,
+    });
+    expect(valueRightOf(wb, ev, "Informe", "Saldo actual")).toBe(1750);
+    expect(tableRow(wb, ev, "Miembros", "Nombre", "Hna. Carmen López")).toMatchObject({
+      "Total aportado": 900,
+      Aportes: 1,
+    });
+  });
+
+  it("rifas-y-colectas: boletos, cobros, ganancia neta y vendedores", async () => {
+    const { wb, ev } = await buildExample("rifas-y-colectas");
+    expect(tableRow(wb, ev, "Boletos", "Número", "03")).toMatchObject({
+      Comprador: "Julia Ramos",
+      Valor: 50,
+      Cobrado: 50,
+    });
+    expect(tableRow(wb, ev, "Boletos", "Número", "01")).toMatchObject({ Cobrado: 0 });
+    expect(valueRightOf(wb, ev, "Resumen", "Boletos vendidos")).toBe(4);
+    expect(valueRightOf(wb, ev, "Resumen", "Boletos sin vender")).toBe(96);
+    expect(valueRightOf(wb, ev, "Resumen", "Pendiente de cobro")).toBe(50);
+    expect(valueRightOf(wb, ev, "Resumen", "Ganancia neta (cobrado + donaciones − gastos)")).toBe(
+      800,
+    );
+    expect(valueRightOf(wb, ev, "Resumen", "Avance de la meta")).toBeCloseTo(0.08, 6);
+    expect(tableRow(wb, ev, "Resumen", "Vendedor", "María")).toMatchObject({
+      Boletos: 2,
+      Vendido: 100,
+      Cobrado: 50,
+      "Por cobrar": 50,
+    });
+  });
+
+  it("aportes-asociaciones: inscripción, morosos y saldo mes a mes", async () => {
+    const { wb, ev } = await buildExample("aportes-asociaciones");
+    expect(tableRow(wb, ev, "Socios", "Socio", "Juan Pérez")).toMatchObject({
+      "Total pagado": 1100,
+      "Debería llevar": 1100,
+      Estado: "Al día",
+    });
+    expect(tableRow(wb, ev, "Socios", "Socio", "Marta Sánchez")).toMatchObject({
+      "Total pagado": 700,
+      "Saldo pendiente": 400,
+      Estado: "Moroso",
+    });
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Enero")).toMatchObject({ Cuotas: 600, Saldo: 750 });
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Febrero")).toMatchObject({
+      "Aportes extra": 300,
+      Saldo: 1450,
+    });
+    expect(valueRightOf(wb, ev, "Resumen", "Socios morosos")).toBe(2);
+    expect(valueRightOf(wb, ev, "Resumen", "Saldo pendiente de socios")).toBe(900);
+    expect(valueRightOf(wb, ev, "Resumen", "Saldo actual")).toBe(1450);
+  });
+
+  it("administracion-de-condominios: alícuota, cuota, estado de cuenta y ejecución", async () => {
+    const { wb, ev } = await buildExample("administracion-de-condominios");
+    const toCollect = 13300 * 1.1;
+    expect(valueRightOf(wb, ev, "Presupuesto", "Total mensual a cobrar")).toBeCloseTo(toCollect, 2);
+    const a2 = tableRow(wb, ev, "Cuotas", "Unidad", "Casa A-2");
+    expect(a2["Alícuota"]).toBeCloseTo(150 / 540, 6);
+    expect(a2["Cuota mensual"]).toBeCloseTo(4063.89, 2);
+    expect(a2.Estado).toBe("Moroso");
+    expect(tableRow(wb, ev, "Cuotas", "Unidad", "Casa A-1").Estado).toBe("Al día");
+    expect(valueRightOf(wb, ev, "Estado de cuenta", "Saldo vencido")).toBeCloseTo(8127.78, 2);
+    expect(valueRightOf(wb, ev, "Estado de cuenta", "Recargo por mora")).toBeCloseTo(406.39, 2);
+    expect(valueRightOf(wb, ev, "Estado de cuenta", "Total a pagar")).toBeCloseTo(8534.17, 2);
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Enero")).toMatchObject({
+      Presupuesto: 13300,
+      "Gasto real": 7150,
+      Diferencia: 6150,
+    });
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Enero")["Saldo en caja"]).toBeCloseTo(
+      14630 - 7150,
+      2,
+    );
+    const vig = tableRow(wb, ev, "Resumen", "Ejecución por categoría", "Vigilancia");
+    expect(vig).toMatchObject({
+      "Presupuesto anual": 72000,
+      "Gasto real": 12000,
+      Disponible: 60000,
+    });
+    expect(vig["% ejecutado"]).toBeCloseTo(1 / 6, 6);
+    expect(valueRightOf(wb, ev, "Resumen", "Unidades morosas")).toBe(2);
+  });
+
+  it("contrato-de-arrendamiento: cláusulas con renta en letras y calendario", async () => {
+    const { wb, ev } = await buildExample("contrato-de-arrendamiento");
+    expect(paragraphStarting(wb, ev, "Contrato", "TERCERA")).toContain(
+      "OCHO MIL LEMPIRAS CON 00/100 (L 8,000.00)",
+    );
+    expect(paragraphStarting(wb, ev, "Contrato", "SEGUNDA")).toContain("12 meses");
+    expect(paragraphStarting(wb, ev, "Contrato", "OCTAVA")).toContain("mascota");
+    expect(paragraphStarting(wb, ev, "Contrato", "NOVENA")).toContain("Honduras");
+    expect(columnBelow(wb, ev, "Calendario de pagos", "Estado", 2)).toEqual([
+      "Pagado",
+      "Pendiente",
+    ]);
+    expect(columnBelow(wb, ev, "Calendario de pagos", "N.º", 13)[12]).toBe("");
+    expect(valueRightOf(wb, ev, "Calendario de pagos", "Valor total del contrato")).toBe(96000);
+    expect(valueRightOf(wb, ev, "Calendario de pagos", "Pagado a la fecha")).toBe(8000);
+  });
+
+  it("gastos-de-propiedades: resultado y rendimiento por propiedad", async () => {
+    const { wb, ev } = await buildExample("gastos-de-propiedades");
+    const casa = tableRow(wb, ev, "Propiedades", "Propiedad", "Casa Col. Kennedy");
+    expect(casa).toMatchObject({
+      "Ingresos del año": 9000,
+      "Gastos del año": 3050,
+      "Resultado neto": 5950,
+    });
+    expect(casa["Rendimiento anual"]).toBeCloseTo(5950 / 1_800_000, 8);
+    expect(tableRow(wb, ev, "Propiedades", "Propiedad", "Local Barrio Abajo")).toMatchObject({
+      "Resultado neto": 24000,
+      "% de los gastos": 0,
+    });
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Enero")).toMatchObject({
+      Ingresos: 21000,
+      Gastos: 650,
+      Resultado: 20350,
+    });
+    expect(
+      tableRow(wb, ev, "Resumen", "Gastos por categoría", "Impuesto de bienes inmuebles"),
+    ).toMatchObject({
+      "Total del año": 2400,
+    });
+  });
+
+  it("rentabilidad-inmobiliaria: cuota, flujo, saldo del préstamo y TIR", async () => {
+    const { wb, ev } = await buildExample("rentabilidad-inmobiliaria");
+    const price = 2_200_000;
+    const loan = price * 0.8;
+    const payment = pmt(loan, 0.11 / 12, 240);
+    expect(valueRightOf(wb, ev, "Análisis", "Inversión inicial en efectivo")).toBeCloseTo(
+      price * 0.2 + price * 0.04 + 80000,
+      2,
+    );
+    expect(valueRightOf(wb, ev, "Análisis", "Cuota mensual del préstamo")).toBeCloseTo(payment, 2);
+    const effective = 15000 * 12 * 0.92;
+    const opex = Math.round(price * 0.0035) + Math.round(price * 0.003) + effective * 0.06;
+    const noi = effective - opex;
+    expect(valueRightOf(wb, ev, "Análisis", "Ingreso neto operativo (NOI)")).toBeCloseTo(noi, 2);
+    expect(valueRightOf(wb, ev, "Análisis", "Flujo de caja del año 1")).toBeCloseTo(
+      noi - payment * 12,
+      2,
+    );
+    const r = 0.11 / 12;
+    const balance10 = loan * Math.pow(1 + r, 120) - payment * ((Math.pow(1 + r, 120) - 1) / r);
+    expect(columnBelow(wb, ev, "Análisis", "Saldo del préstamo", 11)[10]).toBeCloseTo(balance10, 2);
+    expect(columnBelow(wb, ev, "Análisis", "Año", 12)[11]).toBe("");
+    const flows = columnBelow(wb, ev, "Análisis", "Flujo con venta", 11).map(Number);
+    const irr = Number(valueRightOf(wb, ev, "Análisis", "TIR al vender al final"));
+    const npv = flows.reduce((acc, f, i) => acc + f / Math.pow(1 + irr, i), 0);
+    expect(Math.abs(npv)).toBeLessThan(1);
+    expect(tableRow(wb, ev, "Comparar", "Concepto", "Préstamo")["Propiedad B"]).toBe(
+      1_500_000 * 0.8,
+    );
+  });
+
+  it("ventas-de-lotes-a-plazos: cuota, atraso, estados y amortización", async () => {
+    const { wb, ev } = await buildExample("ventas-de-lotes-a-plazos");
+    const p1 = Math.round(pmt(240000 - 24000, 0.01, 60) * 100) / 100;
+    const p2 = Math.round(pmt(360000 - 36000, 0.01, 60) * 100) / 100;
+    expect(tableRow(wb, ev, "Contratos", "Contrato", "V-001")).toMatchObject({
+      Precio: 240000,
+      Financiado: 216000,
+      "Cuota mensual": p1,
+      "Cuotas vencidas": 3,
+      "Cuotas pagadas": 3,
+      Atraso: 0,
+      Estado: "Al día",
+    });
+    const v2 = tableRow(wb, ev, "Contratos", "Contrato", "V-002");
+    expect(v2).toMatchObject({ "Cuotas vencidas": 4, Estado: "Atrasado" });
+    expect(v2.Atraso).toBeCloseTo(3 * p2, 2);
+    expect(tableRow(wb, ev, "Contratos", "Contrato", "V-003")).toMatchObject({
+      Atraso: 0,
+      Estado: "Al día",
+    });
+    expect(tableRow(wb, ev, "Lotes", "Lote", "A-01")).toMatchObject({
+      Estado: "Vendido",
+      Cliente: "Wilmer Antonio Cruz",
+    });
+    expect(tableRow(wb, ev, "Lotes", "Lote", "A-03").Estado).toBe("Reservado");
+    expect(tableRow(wb, ev, "Lotes", "Lote", "B-02").Estado).toBe("Disponible");
+    expect(valueRightOf(wb, ev, "Resumen", "Lotes vendidos")).toBe(3);
+    expect(valueRightOf(wb, ev, "Resumen", "Contratos atrasados")).toBe(1);
+    expect(columnBelow(wb, ev, "Estado de cuenta", "Interés", 1)[0]).toBe(3240);
+    expect(columnBelow(wb, ev, "Estado de cuenta", "Estado", 3)).toEqual([
+      "Pagada",
+      "Vencida",
+      "Vencida",
+    ]);
   });
 });

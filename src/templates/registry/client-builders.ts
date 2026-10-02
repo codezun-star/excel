@@ -84,4 +84,13 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
     import("../finanzas-personales/presupuesto-de-bodas-eventos/build").then((m) => m.build),
   "lista-del-super": () =>
     import("../finanzas-personales/lista-del-super/build").then((m) => m.build),
+  "contabilidad-de-iglesias": () =>
+    import("../comunidad/contabilidad-de-iglesias/build").then((m) => m.build),
+  "rifas-y-colectas": () => import("../comunidad/rifas-y-colectas/build").then((m) => m.build),
+  "aportes-asociaciones": () =>
+    import("../comunidad/aportes-asociaciones/build").then((m) => m.build),
+  "contrato-de-arrendamiento": () =>
+    import("../bienes-raices/contrato-de-arrendamiento/build").then((m) => m.build),
+  "gastos-de-propiedades": () =>
+    import("../bienes-raices/gastos-de-propiedades/build").then((m) => m.build),
 };

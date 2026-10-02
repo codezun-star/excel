@@ -71,6 +71,14 @@ import { meta as jubilacion } from "../finanzas-personales/jubilacion/meta";
 import { meta as pagosDeServicios } from "../finanzas-personales/pagos-de-servicios/meta";
 import { meta as presupuestoDeBodasEventos } from "../finanzas-personales/presupuesto-de-bodas-eventos/meta";
 import { meta as listaDelSuper } from "../finanzas-personales/lista-del-super/meta";
+import { meta as contabilidadDeIglesias } from "../comunidad/contabilidad-de-iglesias/meta";
+import { meta as rifasYColectas } from "../comunidad/rifas-y-colectas/meta";
+import { meta as aportesAsociaciones } from "../comunidad/aportes-asociaciones/meta";
+import { meta as administracionDeCondominios } from "../comunidad/administracion-de-condominios/meta";
+import { meta as contratoDeArrendamiento } from "../bienes-raices/contrato-de-arrendamiento/meta";
+import { meta as gastosDePropiedades } from "../bienes-raices/gastos-de-propiedades/meta";
+import { meta as rentabilidadInmobiliaria } from "../bienes-raices/rentabilidad-inmobiliaria/meta";
+import { meta as ventasDeLotesAPlazos } from "../bienes-raices/ventas-de-lotes-a-plazos/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -152,4 +160,12 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   pagosDeServicios,
   presupuestoDeBodasEventos,
   listaDelSuper,
+  contabilidadDeIglesias,
+  rifasYColectas,
+  aportesAsociaciones,
+  administracionDeCondominios,
+  contratoDeArrendamiento,
+  gastosDePropiedades,
+  rentabilidadInmobiliaria,
+  ventasDeLotesAPlazos,
 ];

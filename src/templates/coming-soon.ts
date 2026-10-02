@@ -83,64 +83,8 @@ export const COMING_SOON: TemplateMeta[] = [
   // ---------------------------------------------------------------- Finanzas personales
 
   // ---------------------------------------------------------------- Comunidad
-  comingSoon("comunidad", {
-    slug: "contabilidad-de-iglesias",
-    title: "Contabilidad de iglesias",
-    shortDescription: "Diezmos, ofrendas, donaciones y gastos con informe mensual.",
-    tier: "free",
-    businessTypes: ["iglesia-ong"],
-  }),
-  comingSoon("comunidad", {
-    slug: "rifas-y-colectas",
-    title: "Rifas y colectas",
-    shortDescription: "Números vendidos, pagos pendientes, premios y fondos recaudados.",
-    tier: "free",
-    businessTypes: ["iglesia-ong", "escuela"],
-  }),
-  comingSoon("comunidad", {
-    slug: "aportes-asociaciones",
-    title: "Aportes de asociaciones",
-    shortDescription: "Aportaciones de miembros, actividades y rendición de cuentas.",
-    tier: "free",
-    businessTypes: ["iglesia-ong"],
-  }),
-  comingSoon("comunidad", {
-    slug: "administracion-de-condominios",
-    title: "Administración de condominios",
-    shortDescription: "Cuotas de mantenimiento, gastos comunes y estado de cuenta por unidad.",
-    tier: "pro",
-    businessTypes: ["inmobiliaria"],
-  }),
 
   // ---------------------------------------------------------------- Bienes raíces
-  comingSoon("bienes-raices", {
-    slug: "contrato-de-arrendamiento",
-    title: "Datos de contrato de arrendamiento",
-    shortDescription: "Ficha de contratos con fechas, montos, ajustes y renovaciones.",
-    tier: "free",
-    businessTypes: ["inmobiliaria"],
-  }),
-  comingSoon("bienes-raices", {
-    slug: "gastos-de-propiedades",
-    title: "Gastos de propiedades",
-    shortDescription: "Gastos de mantenimiento, impuestos y servicios por propiedad.",
-    tier: "free",
-    businessTypes: ["inmobiliaria"],
-  }),
-  comingSoon("bienes-raices", {
-    slug: "rentabilidad-inmobiliaria",
-    title: "Rentabilidad inmobiliaria",
-    shortDescription: "Rentabilidad bruta y neta, retorno de la inversión y años de recuperación.",
-    tier: "pro",
-    businessTypes: ["inmobiliaria"],
-  }),
-  comingSoon("bienes-raices", {
-    slug: "ventas-de-lotes-a-plazos",
-    title: "Venta de lotes a plazos",
-    shortDescription: "Lotes vendidos con prima, cuotas, pagos recibidos y saldo de cada cliente.",
-    tier: "pro",
-    businessTypes: ["inmobiliaria"],
-  }),
 
   // ---------------------------------------------------------------- Emprendedores
   comingSoon("emprendedores", {
