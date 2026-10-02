@@ -57,11 +57,11 @@ export default async function PricingPage() {
   const faq = [
     {
       q: "¿Cómo puedo pagar desde Honduras?",
-      a: `Con ${providers.length ? providers.map((p) => p.label.toLowerCase()).join(", ") : "transferencia bancaria"}. Los precios están en dólares; el monto en lempiras es una referencia al tipo de cambio de L ${rate.toFixed(2)} por dólar. En transferencias pagas el monto en lempiras que te mostramos.`,
+      a: `Con tarjeta de crédito o débito (Visa, Mastercard, Apple Pay o Google Pay, procesado por Paddle) o con transferencia o depósito a nuestras cuentas en BAC Credomatic, Banco Atlántida o Banco Promerica, desde la app de tu banco, por ACH o en ventanilla. Los precios están en dólares; en transferencias pagas el monto en lempiras al tipo de cambio de referencia de L ${rate.toFixed(2)} por dólar.`,
     },
     {
       q: "¿Cuándo se activa mi plan?",
-      a: "Con tarjeta o PayPal, en cuanto el procesador confirma el pago (normalmente unos segundos). Con transferencia, cuando revisamos tu comprobante en horario hábil, casi siempre el mismo día.",
+      a: "Con tarjeta, en cuanto Paddle confirma el pago (normalmente unos segundos). Con transferencia o depósito, cuando revisamos tu comprobante en horario hábil, casi siempre el mismo día.",
     },
     {
       q: "¿Puedo cancelar cuando quiera?",

@@ -5,16 +5,11 @@ import type { CountryCode } from "@/countries";
 import { providerOrder } from "./config";
 import { manualProvider } from "./providers/manual";
 import { paddleProvider } from "./providers/paddle";
-import { paypalProvider } from "./providers/paypal";
-import { pagaditoProvider, tilopayProvider } from "./providers/local";
 import type { CheckoutItem, PaymentProvider, ProviderId } from "./types";
 
 const PROVIDERS: Record<ProviderId, PaymentProvider> = {
-  manual: manualProvider,
   paddle: paddleProvider,
-  paypal: paypalProvider,
-  tilopay: tilopayProvider,
-  pagadito: pagaditoProvider,
+  manual: manualProvider,
 };
 
 export function getProvider(id: ProviderId): PaymentProvider {

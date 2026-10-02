@@ -1,5 +1,3 @@
-import { generateKeyPairSync, createSign } from "node:crypto";
-
 import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -12,14 +10,6 @@ import {
   signPaddlePayload,
   verifyPaddleSignature,
 } from "./providers/paddle-core";
-import {
-  decodeCustomId,
-  encodeCustomId,
-  isTrustedPaypalCertUrl,
-  normalizePaypalEvent,
-  paypalSignedMessage,
-  verifyPaypalSignature,
-} from "./providers/paypal-core";
 import { WebhookSignatureError, type PaymentProvider, type ProviderId } from "./types";
 import { processWebhook, type WebhookDeps, type WebhookOutcome } from "./webhooks";
 
@@ -122,92 +112,6 @@ describe("Paddle: firma y normalización", () => {
       prices,
     );
     expect(refund.event).toEqual({ type: "purchase.refunded", providerPaymentId: "txn_01" });
-  });
-});
-
-describe("PayPal: firma y normalización", () => {
-  const { publicKey, privateKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
-  const webhookId = "WH-PRUEBA";
-  const raw = JSON.stringify({ id: "WH-1", event_type: "PING" });
-
-  function paypalHeaders(body: string, certUrl = "https://api.sandbox.paypal.com/cert.pem") {
-    const message = paypalSignedMessage(body, "tx-1", "2026-10-02T12:00:00Z", webhookId);
-    const sig = createSign("SHA256").update(message).sign(privateKey, "base64");
-    return new Headers({
-      "paypal-transmission-id": "tx-1",
-      "paypal-transmission-time": "2026-10-02T12:00:00Z",
-      "paypal-transmission-sig": sig,
-      "paypal-cert-url": certUrl,
-      "paypal-auth-algo": "SHA256withRSA",
-    });
-  }
-
-  it("verifica la firma RSA con el cuerpo exacto", async () => {
-    const getKey = async () => publicKey;
-    await expect(
-      verifyPaypalSignature(raw, paypalHeaders(raw), webhookId, getKey),
-    ).resolves.toBeUndefined();
-    await expect(
-      verifyPaypalSignature(raw + " ", paypalHeaders(raw), webhookId, getKey),
-    ).rejects.toThrow(WebhookSignatureError);
-    await expect(verifyPaypalSignature(raw, paypalHeaders(raw), "WH-OTRO", getKey)).rejects.toThrow(
-      WebhookSignatureError,
-    );
-  });
-
-  it("solo confía en certificados de dominios de PayPal", async () => {
-    expect(isTrustedPaypalCertUrl("https://api.paypal.com/v1/notifications/certs/X")).toBe(true);
-    expect(isTrustedPaypalCertUrl("https://paypal.com.atacante.net/cert")).toBe(false);
-    expect(isTrustedPaypalCertUrl("http://api.paypal.com/cert")).toBe(false);
-    await expect(
-      verifyPaypalSignature(
-        raw,
-        paypalHeaders(raw, "https://evil.example.com/cert.pem"),
-        webhookId,
-        async () => publicKey,
-      ),
-    ).rejects.toThrow(/no confiable/);
-  });
-
-  it("codifica y decodifica custom_id dentro de 127 caracteres", () => {
-    const id = encodeCustomId({
-      userId: USER,
-      templateSlug: "planilla-de-sueldos",
-      accessDays: 7,
-      couponCode: "LANZAMIENTO20",
-    });
-    expect(id.length).toBeLessThanOrEqual(127);
-    expect(decodeCustomId(id)).toEqual({
-      userId: USER,
-      templateSlug: "planilla-de-sueldos",
-      accessDays: 7,
-      couponCode: "LANZAMIENTO20",
-    });
-  });
-
-  it("las renovaciones consultan la suscripción para obtener el nuevo período", async () => {
-    const plans = { "P-PRO-M": { planCode: "pro" as const, cycle: "monthly" as const } };
-    const parsed = await normalizePaypalEvent(
-      {
-        id: "WH-2",
-        event_type: "PAYMENT.SALE.COMPLETED",
-        resource: { id: "SALE-1", billing_agreement_id: "I-SUB1" },
-      },
-      plans,
-      async (id) => ({
-        id,
-        plan_id: "P-PRO-M",
-        custom_id: `u:${USER}`,
-        billing_info: { next_billing_time: "2099-12-01T00:00:00Z" },
-      }),
-    );
-    expect(parsed.event).toMatchObject({
-      type: "subscription.renewed",
-      userId: USER,
-      planCode: "pro",
-      providerSubscriptionId: "I-SUB1",
-      currentPeriodEnd: "2099-12-01T00:00:00Z",
-    });
   });
 });
 

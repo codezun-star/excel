@@ -80,7 +80,7 @@ servidor (rol de servicio) o un administrador. Los usuarios solo **leen** sus fi
 | Tabla                | Para qué sirve                                                                                            | Quién escribe             |
 | -------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------- |
 | `plans`              | Precios, límites (`limits`, mismas claves que `PlanLimits` en `src/config/plans.ts`) y beneficios.        | Admin                     |
-| `subscriptions`      | Suscripciones por proveedor (`paddle`, `paypal`, `manual`, …), estado y fin del período.                  | Servidor / admin          |
+| `subscriptions`      | Suscripciones por proveedor (`paddle`, `manual` para transferencias, `coupon`, `admin`), estado y fin del período.                  | Servidor / admin          |
 | `purchases`          | Compras únicas de plantillas Pro.                                                                         | Servidor / admin          |
 | `entitlements`       | **La fuente de verdad del acceso**: `kind` (`plan` o `template`), `ref`, `valid_until`, `source` (único). | Servidor / admin          |
 | `usage_counters`     | Descargas por mes de cada cuenta (`user_id`) o visitante anónimo (`anon_id` de cookie firmada).           | Función `increment_…`     |
@@ -164,8 +164,8 @@ update public.plans set price_monthly_usd = 7, price_yearly_usd = 60 where code 
 update public.plans set limits = jsonb_set(limits, '{downloadsPerMonth}', '10') where code = 'free';
 ```
 
-Si usas Paddle o PayPal, el precio que se cobra es el del **producto en el
-proveedor** (variables `PADDLE_PRICE_*` / `PAYPAL_PLAN_*`); actualiza ambos.
+Con Paddle, el precio que se cobra es el del **precio en Paddle** (variables
+`PADDLE_PRICE_*`); actualiza ambos.
 
 ### Otorgar acceso a mano (cortesía o soporte)
 

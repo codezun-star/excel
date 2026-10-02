@@ -66,3 +66,24 @@ describe("pagos manuales", () => {
     expect(sniffProofType(exe)).toBeNull();
   });
 });
+
+describe("cuentas bancarias de Honduras", () => {
+  it("solo muestra los bancos con número de cuenta y usa el titular por defecto", async () => {
+    const { bankAccountsFromEnv, bankName } = await import("./banks");
+    const accounts = bankAccountsFromEnv({
+      MANUAL_BANK_ACCOUNT_HOLDER: "Codezun S. de R.L.",
+      BANK_BAC_ACCOUNT_NUMBER: "730000000",
+      BANK_PROMERICA_ACCOUNT_NUMBER: "10000000",
+      BANK_PROMERICA_CURRENCY: "usd",
+      BANK_PROMERICA_ACCOUNT_HOLDER: "Otra Empresa",
+    });
+    expect(accounts.map((a) => a.id)).toEqual(["bac", "promerica"]);
+    expect(accounts[0]).toMatchObject({
+      bankName: "BAC Credomatic",
+      accountHolder: "Codezun S. de R.L.",
+      currency: "HNL",
+    });
+    expect(accounts[1]).toMatchObject({ accountHolder: "Otra Empresa", currency: "USD" });
+    expect(bankName("atlantida")).toBe("Banco Atlántida");
+  });
+});

@@ -15,10 +15,8 @@ import type { CheckoutResult } from "@/payments/types";
 
 type ManualResult = Extract<CheckoutResult, { type: "manual" }>;
 
-function formatLocal(amount: number, currency: string): string {
-  if (currency === "HNL")
-    return `L ${new Intl.NumberFormat("es-HN", { minimumFractionDigits: 2 }).format(amount)}`;
-  return new Intl.NumberFormat("es-HN", { style: "currency", currency }).format(amount);
+function formatHnlAmount(amount: number): string {
+  return `L ${new Intl.NumberFormat("es-HN", { minimumFractionDigits: 2 }).format(amount)}`;
 }
 
 function CopyRow({ label, value }: { label: string; value: string }) {
@@ -47,13 +45,15 @@ function CopyRow({ label, value }: { label: string; value: string }) {
 export function ManualPaymentPanel({ result, title }: { result: ManualResult; title: string }) {
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
-  const i = result.instructions;
+  const accounts = result.instructions.accounts;
+  const [bank, setBank] = useState(accounts[0]?.id ?? "");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSending(true);
     const formData = new FormData(e.currentTarget);
     formData.set("paymentId", result.paymentId);
+    formData.set("bank", bank);
     const res = await uploadPaymentProof(formData);
     setSending(false);
     if (res.ok) setDone(true);
@@ -81,16 +81,29 @@ export function ManualPaymentPanel({ result, title }: { result: ManualResult; ti
       <section className="rounded-xl border bg-card p-5">
         <h2 className="font-heading text-lg font-bold">1. Transfiere o deposita</h2>
         <p className="mt-1 text-sm text-muted-foreground">{title}</p>
-        <dl className="mt-4 divide-y">
-          <CopyRow label="Monto" value={formatLocal(result.amountLocal, result.localCurrency)} />
-          <CopyRow label="Banco" value={i.bankName} />
-          <CopyRow label="Titular" value={i.accountHolder} />
-          <CopyRow label={i.accountType} value={i.accountNumber} />
+        <dl className="mt-3 divide-y rounded-lg bg-muted/40 px-3">
+          <CopyRow label="Monto en lempiras" value={formatHnlAmount(result.amountHnl)} />
           <CopyRow label="Referencia (escríbela en la descripción)" value={result.reference} />
         </dl>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Equivale a {formatUsd(result.amountUsd)} al tipo de cambio de referencia. Si usas una
+          cuenta en dólares, transfiere {formatUsd(result.amountUsd)}.
+        </p>
+        <h3 className="mt-5 text-sm font-semibold">Elige el banco</h3>
+        <div className="mt-2 grid gap-3">
+          {accounts.map((a) => (
+            <div key={a.id} className="rounded-lg border p-3">
+              <p className="font-semibold">{a.bankName}</p>
+              <dl className="divide-y">
+                <CopyRow label={`${a.accountType} (${a.currency})`} value={a.accountNumber} />
+                <CopyRow label="Titular" value={a.accountHolder} />
+              </dl>
+            </div>
+          ))}
+        </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Equivale a {formatUsd(result.amountUsd)} al tipo de cambio de referencia.
-          {i.extra ? ` ${i.extra}` : ""}
+          Puedes pagar desde la app de tu banco, por ACH desde cualquier banco del país o en
+          ventanilla.{result.instructions.extra ? ` ${result.instructions.extra}` : ""}
         </p>
       </section>
       <section className="rounded-xl border bg-card p-5">
@@ -107,6 +120,29 @@ export function ManualPaymentPanel({ result, title }: { result: ManualResult; ti
             />
             <p className="text-xs text-muted-foreground">PNG, JPG, WebP o PDF de hasta 4 MB.</p>
           </div>
+          {accounts.length > 1 && (
+            <fieldset className="grid gap-1.5">
+              <legend className="mb-1 text-sm font-medium">¿A qué banco pagaste?</legend>
+              <div className="flex flex-wrap gap-2">
+                {accounts.map((a) => (
+                  <label
+                    key={a.id}
+                    className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm has-[:checked]:border-brand has-[:checked]:bg-brand-soft/60"
+                  >
+                    <input
+                      type="radio"
+                      name="bank-choice"
+                      value={a.id}
+                      checked={bank === a.id}
+                      onChange={() => setBank(a.id)}
+                      className="accent-[var(--brand)]"
+                    />
+                    {a.bankName}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )}
           <div className="grid gap-1.5">
             <Label htmlFor="notas">Notas (opcional)</Label>
             <Textarea

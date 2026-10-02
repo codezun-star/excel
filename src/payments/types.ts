@@ -1,14 +1,13 @@
 import type { BillingCycle } from "@/config/plans";
 import type { CountryCode } from "@/countries";
 
-export type ProviderId = "manual" | "paddle" | "paypal" | "tilopay" | "pagadito";
-export const PROVIDER_IDS: readonly ProviderId[] = [
-  "manual",
-  "paddle",
-  "paypal",
-  "tilopay",
-  "pagadito",
-];
+/**
+ * Proveedores de pago: Paddle (tarjeta) y transferencia o depósito bancario
+ * (manual). Para agregar otro: sumarlo aquí, implementar PaymentProvider y
+ * registrarlo en registry.ts.
+ */
+export type ProviderId = "paddle" | "manual";
+export const PROVIDER_IDS: readonly ProviderId[] = ["paddle", "manual"];
 
 export function isProviderId(value: string): value is ProviderId {
   return (PROVIDER_IDS as readonly string[]).includes(value);
@@ -36,12 +35,19 @@ export interface CheckoutInput {
   cancelUrl: string;
 }
 
-export interface BankInstructions {
+export interface BankAccount {
+  /** Identificador corto: bac, atlantida, promerica */
+  id: string;
   bankName: string;
   accountHolder: string;
   accountNumber: string;
   accountType: string;
+  /** HNL o USD */
   currency: string;
+}
+
+export interface BankInstructions {
+  accounts: BankAccount[];
   extra: string | null;
 }
 
@@ -52,8 +58,8 @@ export type CheckoutResult =
       paymentId: string;
       reference: string;
       amountUsd: number;
-      amountLocal: number;
-      localCurrency: string;
+      /** Monto en lempiras al tipo de cambio de referencia */
+      amountHnl: number;
       instructions: BankInstructions;
     };
 

@@ -5,13 +5,14 @@ import type { ProviderId } from "./types";
 /**
  * Qué medios de pago se ofrecen en cada país y en qué orden. Un proveedor
  * aparece solo si además está activado por su feature flag
- * (PAYMENTS_<PROVEEDOR>_ENABLED=true) y tiene todas sus variables de entorno.
+ * (PAYMENTS_<PROVEEDOR>_ENABLED=true) y tiene sus variables de entorno.
+ * Las transferencias son a cuentas en Honduras, por eso solo se ofrecen ahí.
  */
 export const COUNTRY_PROVIDERS: Partial<Record<CountryCode, ProviderId[]>> & {
   default: ProviderId[];
 } = {
-  HN: ["paddle", "paypal", "tilopay", "pagadito", "manual"],
-  default: ["paddle", "paypal", "manual"],
+  HN: ["paddle", "manual"],
+  default: ["paddle"],
 };
 
 /** Lee un flag booleano de entorno ("true", "1", "yes", "si"). */

@@ -8,7 +8,7 @@ import { processWebhook, type WebhookOutcome } from "@/payments/webhooks";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Webhooks de todos los proveedores: /api/webhooks/paddle, /api/webhooks/paypal, … */
+/** Webhooks de los proveedores de pago: /api/webhooks/paddle */
 export async function POST(request: Request, ctx: { params: Promise<{ provider: string }> }) {
   const { provider } = await ctx.params;
   // El cuerpo EXACTO es necesario para verificar la firma: no usar request.json().

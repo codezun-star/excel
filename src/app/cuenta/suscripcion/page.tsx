@@ -31,11 +31,9 @@ export const dynamic = "force-dynamic";
 
 const PROVIDER_LABEL: Record<string, string> = {
   paddle: "Tarjeta (Paddle)",
-  paypal: "PayPal",
   manual: "Transferencia",
   coupon: "Cupón",
   admin: "Cortesía",
-  tilopay: "Tilopay",
 };
 const STATUS: Record<string, { label: string; variant: "free" | "pro" | "outline" }> = {
   active: { label: "Activa", variant: "free" },
@@ -202,7 +200,7 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
                     {fmtDate(s.current_period_end as string | null)}
                     {s.provider === "manual" && !ended ? " (sin renovación automática)" : ""}
                   </p>
-                  {(s.provider === "paddle" || s.provider === "paypal") && !ended && (
+                  {s.provider === "paddle" && !ended && (
                     <div className="mt-3">
                       <SubscriptionButtons
                         subscriptionId={String(s.id)}

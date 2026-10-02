@@ -3,7 +3,8 @@ import "server-only";
 import { BILLING_DEFAULTS } from "@/config/plans";
 import { requireServiceSupabase } from "@/lib/billing/service-client";
 
-import { envFlag, hasEnv } from "../config";
+import { bankAccountsFromEnv } from "../banks";
+import { envFlag } from "../config";
 import { generateReference } from "../reference";
 import {
   WebhookSignatureError,
@@ -13,26 +14,17 @@ import {
   type PaymentProvider,
 } from "../types";
 
-/** Datos bancarios desde variables de entorno (nunca en el código). */
+/** Cuentas de BAC, Atlántida y Promerica desde variables de entorno (nunca en el código). */
 export function bankInstructions(): BankInstructions {
   return {
-    bankName: process.env.MANUAL_BANK_NAME ?? "",
-    accountHolder: process.env.MANUAL_BANK_ACCOUNT_HOLDER ?? "",
-    accountNumber: process.env.MANUAL_BANK_ACCOUNT_NUMBER ?? "",
-    accountType: process.env.MANUAL_BANK_ACCOUNT_TYPE ?? "Cuenta de ahorro",
-    currency: process.env.MANUAL_BANK_CURRENCY ?? "HNL",
+    accounts: bankAccountsFromEnv(),
     extra: process.env.MANUAL_PAYMENT_EXTRA?.trim() || null,
   };
 }
 
-/** Monto en la moneda de la cuenta (HNL al tipo de cambio de referencia). */
-export function localAmount(amountUsd: number): { amount: number; currency: string } {
-  const currency = process.env.MANUAL_BANK_CURRENCY ?? "HNL";
-  if (currency === "USD") return { amount: amountUsd, currency };
-  return {
-    amount: Math.ceil(amountUsd * BILLING_DEFAULTS.exchangeRateUsdHnl),
-    currency,
-  };
+/** Monto en lempiras al tipo de cambio de referencia (redondeado hacia arriba). */
+export function amountInHnl(amountUsd: number): number {
+  return Math.ceil(amountUsd * BILLING_DEFAULTS.exchangeRateUsdHnl);
 }
 
 const PENDING_REUSE_DAYS = 7;
@@ -44,21 +36,18 @@ const PENDING_REUSE_DAYS = 7;
  */
 export const manualProvider: PaymentProvider = {
   id: "manual",
-  label: "Transferencia o depósito",
+  label: "Transferencia o depósito (BAC, Atlántida, Promerica)",
   description:
-    "Paga desde tu banca en línea o en ventanilla y sube el comprobante. Lo revisamos en horario hábil.",
+    "Paga en lempiras desde tu banca en línea, por ACH desde cualquier banco o en ventanilla, y sube el comprobante. Lo revisamos en horario hábil.",
   supports: { subscriptions: true, oneTime: true },
 
   isEnabled() {
-    return (
-      envFlag("PAYMENTS_MANUAL_ENABLED", true) &&
-      hasEnv("MANUAL_BANK_NAME", "MANUAL_BANK_ACCOUNT_HOLDER", "MANUAL_BANK_ACCOUNT_NUMBER")
-    );
+    return envFlag("PAYMENTS_MANUAL_ENABLED", true) && bankAccountsFromEnv().length > 0;
   },
 
   async createCheckout(input: CheckoutInput): Promise<CheckoutResult> {
     const db = requireServiceSupabase();
-    const local = localAmount(input.amountUsd);
+    const amountHnl = amountInHnl(input.amountUsd);
     const item = input.item;
     const fields = {
       kind: item.kind,
@@ -87,8 +76,8 @@ export const manualProvider: PaymentProvider = {
     const amounts = {
       amount: input.amountUsd,
       currency: "USD",
-      amount_local: local.amount,
-      local_currency: local.currency,
+      amount_local: amountHnl,
+      local_currency: "HNL",
       coupon_code: input.coupon?.code ?? null,
     };
 
@@ -110,14 +99,14 @@ export const manualProvider: PaymentProvider = {
           .single();
         if (!error && data) {
           paymentId = data.id as string;
-          return result(paymentId, reference, input.amountUsd, local);
+          return result(paymentId, reference, input.amountUsd, amountHnl);
         }
         lastError = error?.message ?? "sin datos";
         if (error?.code !== "23505") break; // solo se reintenta si la referencia ya existía
       }
       throw new Error(`No se pudo registrar el pago: ${lastError}`);
     }
-    return result(paymentId, reference, input.amountUsd, local);
+    return result(paymentId, reference, input.amountUsd, amountHnl);
   },
 
   async handleWebhook() {
@@ -129,15 +118,14 @@ function result(
   paymentId: string,
   reference: string,
   amountUsd: number,
-  local: { amount: number; currency: string },
+  amountHnl: number,
 ): CheckoutResult {
   return {
     type: "manual",
     paymentId,
     reference,
     amountUsd,
-    amountLocal: local.amount,
-    localCurrency: local.currency,
+    amountHnl,
     instructions: bankInstructions(),
   };
 }

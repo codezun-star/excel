@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { formatUsd } from "@/config/plans";
 import { requireServiceSupabase } from "@/lib/billing/service-client";
+import { bankName } from "@/payments/banks";
 import { describePayment } from "@/payments/describe";
 
 interface Row {
@@ -22,6 +23,7 @@ interface Row {
   amount: number;
   amount_local: number | null;
   local_currency: string | null;
+  bank: string | null;
   reference: string;
   coupon_code: string | null;
   proof_url: string | null;
@@ -52,7 +54,7 @@ async function emailsFor(userIds: string[]): Promise<Map<string, string>> {
 export default async function AdminPaymentsPage() {
   const db = requireServiceSupabase();
   const columns =
-    "id, user_id, kind, plan_code, billing_cycle, template_slug, amount, amount_local, local_currency, reference, coupon_code, proof_url, status, notes, rejection_reason, created_at, reviewed_at";
+    "id, user_id, kind, plan_code, billing_cycle, template_slug, amount, amount_local, local_currency, bank, reference, coupon_code, proof_url, status, notes, rejection_reason, created_at, reviewed_at";
   const [{ data: pending }, { data: recent }] = await Promise.all([
     db
       .from("manual_payments")
@@ -127,6 +129,12 @@ export default async function AdminPaymentsPage() {
                 <p className="text-muted-foreground">
                   Creado el {new Date(r.created_at).toLocaleString("es-HN")}
                 </p>
+                {r.bank && (
+                  <p>
+                    <span className="text-muted-foreground">Banco:</span>{" "}
+                    <strong>{bankName(r.bank) ?? r.bank}</strong>
+                  </p>
+                )}
                 {r.notes && <p className="rounded-md bg-muted p-2">“{r.notes}”</p>}
                 {signed.get(r.id) && (
                   <a

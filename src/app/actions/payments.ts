@@ -10,6 +10,7 @@ import { sendEmail } from "@/lib/email";
 import { emailTemplates } from "@/lib/email/templates";
 import { trackEvent } from "@/lib/analytics/events";
 import { getCurrentUser } from "@/lib/supabase/server";
+import { isBankId } from "@/payments/banks";
 import { describePayment } from "@/payments/describe";
 import { MAX_PROOF_BYTES, sniffProofType } from "@/payments/proof";
 
@@ -32,6 +33,7 @@ interface PaymentRow {
 const uploadSchema = z.object({
   paymentId: z.string().uuid(),
   notes: z.string().trim().max(500).optional(),
+  bank: z.string().refine(isBankId, "Banco no válido").optional(),
 });
 
 /**
@@ -42,6 +44,7 @@ export async function uploadPaymentProof(formData: FormData): Promise<ActionResu
   const input = uploadSchema.safeParse({
     paymentId: formData.get("paymentId"),
     notes: formData.get("notes") || undefined,
+    bank: formData.get("bank") || undefined,
   });
   const file = formData.get("file");
   if (!input.success || !(file instanceof File)) return { ok: false, error: "Datos inválidos" };
@@ -74,7 +77,7 @@ export async function uploadPaymentProof(formData: FormData): Promise<ActionResu
 
   const { error } = await db
     .from("manual_payments")
-    .update({ proof_url: path, notes: input.data.notes ?? null })
+    .update({ proof_url: path, notes: input.data.notes ?? null, bank: input.data.bank ?? null })
     .eq("id", payment.id);
   if (error) return { ok: false, error: "No se pudo guardar el comprobante." };
 
