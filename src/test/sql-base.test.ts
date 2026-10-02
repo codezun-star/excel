@@ -10,7 +10,7 @@ describe("SQL 001: esquema base, RLS y trigger", () => {
   let db: PGlite;
 
   beforeAll(async () => {
-    db = await createTestDb();
+    db = await createTestDb({ upTo: "001" });
     await createUser(db, A, { full_name: "Ana López", country: "hn" });
     await createUser(db, B, { name: "Beto" });
   });

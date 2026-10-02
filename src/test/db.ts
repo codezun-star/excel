@@ -43,19 +43,27 @@ create table if not exists storage.buckets (
 create table if not exists storage.objects (
   id uuid primary key default gen_random_uuid(), bucket_id text, name text, owner uuid
 );
+alter table storage.objects enable row level security;
+grant usage on schema storage to anon, authenticated, service_role;
+grant select on storage.objects to authenticated;
 create or replace function storage.foldername(name text) returns text[] language sql immutable as $$
   select string_to_array(name, '/')
 $$;
 grant usage on schema public to anon, authenticated, service_role;
 `;
 
-export async function createTestDb(): Promise<PGlite> {
+/**
+ * Crea la base y ejecuta los scripts de `supabase/sql/` en orden.
+ * `upTo` limita la ejecución hasta un prefijo (p. ej. "001").
+ */
+export async function createTestDb(options: { upTo?: string } = {}): Promise<PGlite> {
   const db = new PGlite();
   await db.exec(SUPABASE_STUBS);
   const dir = path.join(process.cwd(), "supabase", "sql");
   const files = fs
     .readdirSync(dir)
     .filter((f) => f.endsWith(".sql"))
+    .filter((f) => !options.upTo || f.slice(0, options.upTo.length) <= options.upTo)
     .sort();
   for (const file of files) {
     const sql = fs.readFileSync(path.join(dir, file), "utf8");
