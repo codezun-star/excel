@@ -54,39 +54,11 @@ export const COMING_SOON: TemplateMeta[] = [
 
   // ---------------------------------------------------------------- Inventario
   comingSoon("inventario", {
-    slug: "inventario-stock-minimo",
-    title: "Inventario con stock mínimo",
-    shortDescription: "Existencias con alertas de reorden, valor del inventario y movimientos.",
-    tier: "free",
-    businessTypes: ALL_SHOPS,
-  }),
-  comingSoon("inventario", {
-    slug: "kardex",
-    title: "Kardex",
-    shortDescription: "Tarjeta kardex con costo promedio ponderado, entradas, salidas y saldos.",
-    tier: "free",
-    businessTypes: ALL_SHOPS,
-  }),
-  comingSoon("inventario", {
     slug: "inventario-por-lote-vencimiento",
     title: "Inventario por lote y vencimiento",
     shortDescription: "Lotes con fecha de vencimiento y alertas de productos por vencer.",
     tier: "pro",
     businessTypes: ["farmacia", "pulperia", "comercio", "cafeteria-panaderia"],
-  }),
-  comingSoon("inventario", {
-    slug: "lista-de-precios-margen",
-    title: "Lista de precios con margen",
-    shortDescription: "Precios de venta calculados desde el costo, margen deseado e ISV.",
-    tier: "free",
-    businessTypes: ALL_SHOPS,
-  }),
-  comingSoon("inventario", {
-    slug: "control-de-fiados",
-    title: "Control de fiados",
-    shortDescription: "Créditos de clientes con abonos, saldos y días de atraso.",
-    tier: "free",
-    businessTypes: ["pulperia", "comercio", "ferreteria", "farmacia"],
   }),
   comingSoon("inventario", {
     slug: "mercaderia-en-consignacion",
@@ -217,20 +189,6 @@ export const COMING_SOON: TemplateMeta[] = [
 
   // ---------------------------------------------------------------- Educación
   comingSoon("educacion", {
-    slug: "pensiones-y-mensualidades",
-    title: "Pensiones y mensualidades",
-    shortDescription: "Cobro de mensualidades por alumno con saldos y morosidad.",
-    tier: "free",
-    businessTypes: ["escuela"],
-  }),
-  comingSoon("educacion", {
-    slug: "notas-y-promedios",
-    title: "Notas y promedios",
-    shortDescription: "Calificaciones por parcial con promedios, aprobados y reprobados.",
-    tier: "free",
-    businessTypes: ["escuela"],
-  }),
-  comingSoon("educacion", {
     slug: "asistencia-escolar",
     title: "Asistencia escolar",
     shortDescription: "Lista de asistencia mensual con porcentaje por alumno.",
@@ -260,20 +218,6 @@ export const COMING_SOON: TemplateMeta[] = [
 
   // ---------------------------------------------------------------- Finanzas personales
   comingSoon("finanzas-personales", {
-    slug: "presupuesto-mensual",
-    title: "Presupuesto mensual",
-    shortDescription: "Presupuesto familiar por categorías comparado contra el gasto real.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "gastos-e-ingresos",
-    title: "Gastos e ingresos",
-    shortDescription: "Registro diario de gastos e ingresos con resumen por categoría y mes.",
-    tier: "free",
-    businessTypes: ["hogar", "freelancer"],
-  }),
-  comingSoon("finanzas-personales", {
     slug: "deudas-y-tarjetas",
     title: "Deudas y tarjetas",
     shortDescription:
@@ -282,30 +226,9 @@ export const COMING_SOON: TemplateMeta[] = [
     businessTypes: ["hogar"],
   }),
   comingSoon("finanzas-personales", {
-    slug: "simulador-de-prestamos",
-    title: "Simulador de préstamos",
-    shortDescription: "Tabla de amortización con cuota nivelada, intereses y saldo por mes.",
-    tier: "free",
-    businessTypes: ["hogar", "comercio"],
-  }),
-  comingSoon("finanzas-personales", {
     slug: "ahorro-por-metas",
     title: "Ahorro por metas",
     shortDescription: "Metas de ahorro con aportes mensuales, avance y fecha estimada.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "control-de-remesas",
-    title: "Control de remesas",
-    shortDescription: "Remesas recibidas en dólares, tipo de cambio, lempiras y en qué se usaron.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "prestamo-de-vivienda",
-    title: "Préstamo de vivienda",
-    shortDescription: "Amortización hipotecaria con seguros, abonos extra y ahorro en intereses.",
     tier: "free",
     businessTypes: ["hogar"],
   }),
@@ -347,25 +270,11 @@ export const COMING_SOON: TemplateMeta[] = [
 
   // ---------------------------------------------------------------- Comunidad
   comingSoon("comunidad", {
-    slug: "cuotas-patronato",
-    title: "Cuotas de patronato",
-    shortDescription: "Cuotas mensuales por vivienda con pagos, morosos y gastos del patronato.",
-    tier: "free",
-    businessTypes: ["iglesia-ong"],
-  }),
-  comingSoon("comunidad", {
     slug: "contabilidad-de-iglesias",
     title: "Contabilidad de iglesias",
     shortDescription: "Diezmos, ofrendas, donaciones y gastos con informe mensual.",
     tier: "free",
     businessTypes: ["iglesia-ong"],
-  }),
-  comingSoon("comunidad", {
-    slug: "cajas-de-ahorro-cooperativas",
-    title: "Caja de ahorro y caja rural",
-    shortDescription: "Aportes de socios, préstamos internos, intereses y reparto de utilidades.",
-    tier: "free",
-    businessTypes: ["iglesia-ong", "agro"],
   }),
   comingSoon("comunidad", {
     slug: "rifas-y-colectas",
@@ -390,13 +299,6 @@ export const COMING_SOON: TemplateMeta[] = [
   }),
 
   // ---------------------------------------------------------------- Bienes raíces
-  comingSoon("bienes-raices", {
-    slug: "control-de-alquileres",
-    title: "Control de alquileres",
-    shortDescription: "Inquilinos, rentas mensuales, pagos atrasados y depósitos.",
-    tier: "free",
-    businessTypes: ["inmobiliaria", "hogar"],
-  }),
   comingSoon("bienes-raices", {
     slug: "contrato-de-arrendamiento",
     title: "Datos de contrato de arrendamiento",

@@ -48,6 +48,30 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
   "estado-de-resultados-balance": () =>
     import("../impuestos/estado-de-resultados-balance").then((m) => m.default),
   "presupuesto-anual": () => import("../impuestos/presupuesto-anual").then((m) => m.default),
+  "simulador-de-prestamos": () =>
+    import("../finanzas-personales/simulador-de-prestamos").then((m) => m.default),
+  "prestamo-de-vivienda": () =>
+    import("../finanzas-personales/prestamo-de-vivienda").then((m) => m.default),
+  "inventario-stock-minimo": () =>
+    import("../inventario/inventario-stock-minimo").then((m) => m.default),
+  kardex: () => import("../inventario/kardex").then((m) => m.default),
+  "control-de-fiados": () => import("../inventario/control-de-fiados").then((m) => m.default),
+  "lista-de-precios-margen": () =>
+    import("../inventario/lista-de-precios-margen").then((m) => m.default),
+  "presupuesto-mensual": () =>
+    import("../finanzas-personales/presupuesto-mensual").then((m) => m.default),
+  "gastos-e-ingresos": () =>
+    import("../finanzas-personales/gastos-e-ingresos").then((m) => m.default),
+  "control-de-remesas": () =>
+    import("../finanzas-personales/control-de-remesas").then((m) => m.default),
+  "cuotas-patronato": () => import("../comunidad/cuotas-patronato").then((m) => m.default),
+  "cajas-de-ahorro-cooperativas": () =>
+    import("../comunidad/cajas-de-ahorro-cooperativas").then((m) => m.default),
+  "control-de-alquileres": () =>
+    import("../bienes-raices/control-de-alquileres").then((m) => m.default),
+  "notas-y-promedios": () => import("../educacion/notas-y-promedios").then((m) => m.default),
+  "pensiones-y-mensualidades": () =>
+    import("../educacion/pensiones-y-mensualidades").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

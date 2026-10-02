@@ -52,4 +52,28 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
   "estado-de-resultados-balance": () =>
     import("../impuestos/estado-de-resultados-balance/form").then((m) => m.form),
   "presupuesto-anual": () => import("../impuestos/presupuesto-anual/form").then((m) => m.form),
+  "simulador-de-prestamos": () =>
+    import("../finanzas-personales/simulador-de-prestamos/form").then((m) => m.form),
+  "prestamo-de-vivienda": () =>
+    import("../finanzas-personales/prestamo-de-vivienda/form").then((m) => m.form),
+  "inventario-stock-minimo": () =>
+    import("../inventario/inventario-stock-minimo/form").then((m) => m.form),
+  kardex: () => import("../inventario/kardex/form").then((m) => m.form),
+  "control-de-fiados": () => import("../inventario/control-de-fiados/form").then((m) => m.form),
+  "lista-de-precios-margen": () =>
+    import("../inventario/lista-de-precios-margen/form").then((m) => m.form),
+  "presupuesto-mensual": () =>
+    import("../finanzas-personales/presupuesto-mensual/form").then((m) => m.form),
+  "gastos-e-ingresos": () =>
+    import("../finanzas-personales/gastos-e-ingresos/form").then((m) => m.form),
+  "control-de-remesas": () =>
+    import("../finanzas-personales/control-de-remesas/form").then((m) => m.form),
+  "cuotas-patronato": () => import("../comunidad/cuotas-patronato/form").then((m) => m.form),
+  "cajas-de-ahorro-cooperativas": () =>
+    import("../comunidad/cajas-de-ahorro-cooperativas/form").then((m) => m.form),
+  "control-de-alquileres": () =>
+    import("../bienes-raices/control-de-alquileres/form").then((m) => m.form),
+  "notas-y-promedios": () => import("../educacion/notas-y-promedios/form").then((m) => m.form),
+  "pensiones-y-mensualidades": () =>
+    import("../educacion/pensiones-y-mensualidades/form").then((m) => m.form),
 };

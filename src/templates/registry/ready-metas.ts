@@ -31,6 +31,20 @@ import { meta as libroDiarioMayor } from "../impuestos/libro-diario-mayor/meta";
 import { meta as activosFijosDepreciacion } from "../impuestos/activos-fijos-depreciacion/meta";
 import { meta as estadoDeResultadosBalance } from "../impuestos/estado-de-resultados-balance/meta";
 import { meta as presupuestoAnual } from "../impuestos/presupuesto-anual/meta";
+import { meta as simuladorDePrestamos } from "../finanzas-personales/simulador-de-prestamos/meta";
+import { meta as prestamoDeVivienda } from "../finanzas-personales/prestamo-de-vivienda/meta";
+import { meta as inventarioStockMinimo } from "../inventario/inventario-stock-minimo/meta";
+import { meta as kardex } from "../inventario/kardex/meta";
+import { meta as controlDeFiados } from "../inventario/control-de-fiados/meta";
+import { meta as listaDePreciosMargen } from "../inventario/lista-de-precios-margen/meta";
+import { meta as presupuestoMensual } from "../finanzas-personales/presupuesto-mensual/meta";
+import { meta as gastosEIngresos } from "../finanzas-personales/gastos-e-ingresos/meta";
+import { meta as controlDeRemesas } from "../finanzas-personales/control-de-remesas/meta";
+import { meta as cuotasPatronato } from "../comunidad/cuotas-patronato/meta";
+import { meta as cajasDeAhorroCooperativas } from "../comunidad/cajas-de-ahorro-cooperativas/meta";
+import { meta as controlDeAlquileres } from "../bienes-raices/control-de-alquileres/meta";
+import { meta as notasYPromedios } from "../educacion/notas-y-promedios/meta";
+import { meta as pensionesYMensualidades } from "../educacion/pensiones-y-mensualidades/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -72,4 +86,18 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   activosFijosDepreciacion,
   estadoDeResultadosBalance,
   presupuestoAnual,
+  simuladorDePrestamos,
+  prestamoDeVivienda,
+  inventarioStockMinimo,
+  kardex,
+  controlDeFiados,
+  listaDePreciosMargen,
+  presupuestoMensual,
+  gastosEIngresos,
+  controlDeRemesas,
+  cuotasPatronato,
+  cajasDeAhorroCooperativas,
+  controlDeAlquileres,
+  notasYPromedios,
+  pensionesYMensualidades,
 ];

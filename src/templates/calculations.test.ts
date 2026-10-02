@@ -331,4 +331,136 @@ describe("cálculos de plantillas con datos de ejemplo", () => {
     expect(valueRightOf(wb, ev, "Comparación", "Total ingresos reales")).toBe(112000);
     expect(valueRightOf(wb, ev, "Comparación", "Total gastos reales")).toBe(81000);
   });
+
+  it("simulador-de-prestamos: cuota nivelada y saldo cero al final", async () => {
+    const { wb, ev } = await buildExample("simulador-de-prestamos", { example: false });
+    // 150 000 al 18 % anual, 36 meses → cuota 5 422.86
+    expect(valueRightOf(wb, ev, "Préstamo", "Cuota mensual (capital + interés)")).toBeCloseTo(
+      5422.86,
+      2,
+    );
+    const interest = Number(valueRightOf(wb, ev, "Préstamo", "Total de intereses"));
+    expect(valueRightOf(wb, ev, "Préstamo", "Número de cuotas pagadas")).toBe(36);
+    // El capital pagado suma exactamente el monto prestado
+    expect(
+      Number(valueRightOf(wb, ev, "Préstamo", "Total pagado (capital + intereses)")) - interest,
+    ).toBeCloseTo(150000, 2);
+    expect(interest).toBeGreaterThan(45000);
+    expect(interest).toBeLessThan(45300);
+  });
+
+  it("simulador-de-prestamos: el abono extra reduce cuotas", async () => {
+    const { wb, ev } = await buildExample("simulador-de-prestamos");
+    expect(Number(valueRightOf(wb, ev, "Préstamo", "Número de cuotas pagadas"))).toBeLessThan(36);
+  });
+
+  it("inventario-stock-minimo: existencias y estados", async () => {
+    const { wb, ev } = await buildExample("inventario-stock-minimo");
+    const arroz = tableRow(wb, ev, "Inventario", "Código", "P001");
+    expect(arroz["Existencia"]).toBe(16);
+    expect(arroz["Estado"]).toBe("OK");
+    const gaseosa = tableRow(wb, ev, "Inventario", "Código", "P002");
+    expect(gaseosa["Existencia"]).toBe(20);
+    expect(gaseosa["Estado"]).toBe("Reordenar");
+    expect(tableRow(wb, ev, "Inventario", "Código", "P003")["Estado"]).toBe("Agotado");
+  });
+
+  it("kardex: costo promedio ponderado", async () => {
+    const { wb, ev } = await buildExample("kardex");
+    const ws = wb.getWorksheet("Kardex")!;
+    // 50 × 40 + 100 × 43 = 6 300 / 150 = 42; salen 80 a 42 = 3 360; quedan 70 = 2 940; +60 × 45 = 5 640 / 130
+    let avg: unknown;
+    let outTotal: unknown;
+    ws.eachRow((row) =>
+      row.eachCell((c) => {
+        if (c.value === "Ventas de la semana")
+          outTotal = ev.value("Kardex", ws.getCell(Number(c.row), 8).address);
+        if (c.value === "Compra factura 4630")
+          avg = ev.value("Kardex", ws.getCell(Number(c.row), 11).address);
+      }),
+    );
+    expect(outTotal).toBe(3360);
+    expect(Number(avg)).toBeCloseTo(5640 / 130, 4);
+  });
+
+  it("control-de-fiados: saldo por cliente y total", async () => {
+    const { wb, ev } = await buildExample("control-de-fiados");
+    expect(valueRightOf(wb, ev, "Clientes", "Total por cobrar")).toBe(1225);
+    expect(tableRow(wb, ev, "Clientes", "Cliente", "Don Juan Pérez")["Estado"]).toBe(
+      "Pasó su límite",
+    );
+  });
+
+  it("lista-de-precios-margen: precio con margen e ISV", async () => {
+    const { wb, ev } = await buildExample("lista-de-precios-margen");
+    // 68 / (1 − 0.25) = 90.67 + 15 % = 104.27 → redondeo a 1 = 105
+    const det = tableRow(wb, ev, "Precios", "Código", "P002");
+    expect(Number(det["Precio sin ISV"])).toBeCloseTo(90.6667, 3);
+    expect(det["Precio final"]).toBe(105);
+  });
+
+  it("presupuesto-mensual: gastado por categoría y ahorro", async () => {
+    const { wb, ev } = await buildExample("presupuesto-mensual");
+    expect(tableRow(wb, ev, "Presupuesto", "Categoría de gasto", "Alimentación")["Gastado"]).toBe(
+      4300,
+    );
+    expect(valueRightOf(wb, ev, "Presupuesto", "Lo que queda (ahorro)")).toBe(24500 - 12150);
+  });
+
+  it("gastos-e-ingresos: balance mensual", async () => {
+    const { wb, ev } = await buildExample("gastos-e-ingresos");
+    const enero = tableRow(wb, ev, "Resumen", "Mes", "Enero");
+    expect(enero["Ingresos"]).toBe(20000);
+    expect(enero["Gastos"]).toBe(9400);
+    expect(enero["Balance"]).toBe(10600);
+  });
+
+  it("control-de-remesas: conversión con tipo de cambio y comisión", async () => {
+    const { wb, ev } = await buildExample("control-de-remesas");
+    // 300 × 26.40 + 200 × 26.50 − 50 + 350 × 26.50
+    expect(valueRightOf(wb, ev, "Remesas", "Totales")).toBe(850);
+    const enero = tableRow(wb, ev, "Resumen", "Mes", "Enero");
+    expect(enero["HNL"]).toBeCloseTo(7920 + 5250, 2);
+  });
+
+  it("cuotas-patronato: morosos y saldo en caja", async () => {
+    const { wb, ev } = await buildExample("cuotas-patronato");
+    expect(
+      tableRow(wb, ev, "Cuotas", "Vivienda / familia", "Casa 2 — Familia López")["Saldo pendiente"],
+    ).toBe(200);
+    expect(valueRightOf(wb, ev, "Resumen", "Saldo en caja")).toBe(800 - 450);
+    expect(valueRightOf(wb, ev, "Resumen", "Viviendas morosas")).toBe(1);
+  });
+
+  it("cajas-de-ahorro-cooperativas: fondos y reparto de utilidades", async () => {
+    const { wb, ev } = await buildExample("cajas-de-ahorro-cooperativas");
+    expect(valueRightOf(wb, ev, "Resumen y utilidades", "Total ahorrado por los socios")).toBe(
+      1800,
+    );
+    const jose = tableRow(wb, ev, "Resumen y utilidades", "Socio", "José Martínez");
+    expect(jose["Utilidad que le corresponde"]).toBeCloseTo(133.33, 2);
+  });
+
+  it("control-de-alquileres: por cobrar al corte", async () => {
+    const { wb, ev } = await buildExample("control-de-alquileres");
+    expect(valueRightOf(wb, ev, "Alquileres", "Por cobrar")).toBe(5500);
+  });
+
+  it("notas-y-promedios: promedio, estado y posición", async () => {
+    const { wb, ev } = await buildExample("notas-y-promedios");
+    const carlos = tableRow(wb, ev, "Español", "Alumno", "Carlos Eduardo Mejía");
+    expect(carlos["Promedio"]).toBe(66);
+    expect(carlos["Estado"]).toBe("Reprobado");
+    expect(tableRow(wb, ev, "Consolidado", "Alumno", "Daniela Ramos")["Posición"]).toBe(1);
+  });
+
+  it("pensiones-y-mensualidades: saldo con beca y matrícula", async () => {
+    const { wb, ev } = await buildExample("pensiones-y-mensualidades");
+    expect(tableRow(wb, ev, "Mensualidades", "Alumno", "Diego Fúnez")["Saldo pendiente"]).toBe(
+      1500,
+    );
+    expect(tableRow(wb, ev, "Mensualidades", "Alumno", "Valeria Cruz")["Saldo pendiente"]).toBe(
+      1000,
+    );
+  });
 });

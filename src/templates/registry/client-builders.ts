@@ -29,4 +29,28 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
   "punto-de-equilibrio": () =>
     import("../impuestos/punto-de-equilibrio/build").then((m) => m.build),
   "presupuesto-anual": () => import("../impuestos/presupuesto-anual/build").then((m) => m.build),
+  "simulador-de-prestamos": () =>
+    import("../finanzas-personales/simulador-de-prestamos/build").then((m) => m.build),
+  "prestamo-de-vivienda": () =>
+    import("../finanzas-personales/prestamo-de-vivienda/build").then((m) => m.build),
+  "inventario-stock-minimo": () =>
+    import("../inventario/inventario-stock-minimo/build").then((m) => m.build),
+  kardex: () => import("../inventario/kardex/build").then((m) => m.build),
+  "control-de-fiados": () => import("../inventario/control-de-fiados/build").then((m) => m.build),
+  "lista-de-precios-margen": () =>
+    import("../inventario/lista-de-precios-margen/build").then((m) => m.build),
+  "presupuesto-mensual": () =>
+    import("../finanzas-personales/presupuesto-mensual/build").then((m) => m.build),
+  "gastos-e-ingresos": () =>
+    import("../finanzas-personales/gastos-e-ingresos/build").then((m) => m.build),
+  "control-de-remesas": () =>
+    import("../finanzas-personales/control-de-remesas/build").then((m) => m.build),
+  "cuotas-patronato": () => import("../comunidad/cuotas-patronato/build").then((m) => m.build),
+  "cajas-de-ahorro-cooperativas": () =>
+    import("../comunidad/cajas-de-ahorro-cooperativas/build").then((m) => m.build),
+  "control-de-alquileres": () =>
+    import("../bienes-raices/control-de-alquileres/build").then((m) => m.build),
+  "notas-y-promedios": () => import("../educacion/notas-y-promedios/build").then((m) => m.build),
+  "pensiones-y-mensualidades": () =>
+    import("../educacion/pensiones-y-mensualidades/build").then((m) => m.build),
 };
