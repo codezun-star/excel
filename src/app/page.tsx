@@ -21,6 +21,8 @@ import { HN } from "@/countries/hn";
 import { SITE } from "@/lib/site";
 import { CATEGORIES } from "@/templates/categories";
 import { CATALOG, categoryCounts, featuredTemplates } from "@/templates/catalog";
+import { ArticleCard } from "@/components/blog/article-card";
+import { ARTICLES } from "@/content/blog";
 
 export default function HomePage() {
   const counts = categoryCounts();
@@ -36,12 +38,28 @@ export default function HomePage() {
             "@type": "WebSite",
             name: SITE.name,
             url: SITE.url,
-            inLanguage: "es",
+            inLanguage: "es-HN",
             potentialAction: {
               "@type": "SearchAction",
               target: `${SITE.url}/plantillas?q={search_term_string}`,
               "query-input": "required name=search_term_string",
             },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: SITE.name,
+            url: SITE.url,
+            logo: `${SITE.url}/icon.svg`,
+            email: SITE.contactEmail,
+            areaServed: { "@type": "Country", name: "Honduras" },
+            knowsAbout: [
+              "Planilla de sueldos en Honduras",
+              "Décimo tercer y décimo cuarto mes",
+              "Prestaciones laborales",
+              "ISV e ISR en Honduras",
+              "Plantillas de Excel",
+            ],
           },
           {
             "@context": "https://schema.org",
@@ -220,6 +238,21 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* Guías */}
+      <section className="container-page py-16" aria-labelledby="guias-home">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <SectionTitle eyebrow="Guías para Honduras" title="Aprende a calcularlo, paso a paso" />
+          <Link href="/blog" className="text-sm font-semibold text-brand-strong hover:underline">
+            Ver todas las guías
+          </Link>
+        </div>
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {ARTICLES.slice(0, 6).map((a) => (
+            <ArticleCard key={a.slug} article={a} />
+          ))}
         </div>
       </section>
 

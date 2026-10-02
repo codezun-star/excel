@@ -4,6 +4,7 @@ export const es = {
     templates: "Plantillas",
     categories: "Categorías",
     pricing: "Precios",
+    blog: "Guías",
     howItWorks: "Cómo funciona",
     account: "Mi cuenta",
     login: "Ingresar",

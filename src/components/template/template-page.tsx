@@ -2,11 +2,13 @@ import { CheckIcon, ChevronRightIcon, ClockIcon, UsersIcon } from "lucide-react"
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { ArticleCard } from "@/components/blog/article-card";
 import { TemplateBadges } from "@/components/catalog/tier-badge";
 import { TemplateCard } from "@/components/catalog/template-card";
 import { JsonLd } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { articlesForTemplate } from "@/content/blog";
 import type { CountryContext } from "@/countries";
 import { templateJsonLd } from "@/lib/seo";
 import { getCategory } from "@/templates/categories";
@@ -19,6 +21,7 @@ import { TemplateWorkspace } from "./template-workspace";
 export function TemplatePage({ meta, ctx }: { meta: TemplateMeta; ctx: CountryContext }) {
   const category = getCategory(meta.category);
   const related = relatedTemplates(meta, 4);
+  const guides = articlesForTemplate(meta.slug);
   return (
     <div className="container-page py-8">
       <JsonLd data={templateJsonLd(meta, ctx)} />
@@ -108,6 +111,22 @@ export function TemplatePage({ meta, ctx }: { meta: TemplateMeta; ctx: CountryCo
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+      )}
+
+      {guides.length > 0 && (
+        <section className="mt-12" aria-labelledby="guias">
+          <h2 id="guias" className="text-2xl font-extrabold">
+            Guías paso a paso
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Entiende el cálculo antes de usar la plantilla, con ejemplos en lempiras.
+          </p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {guides.map((a) => (
+              <ArticleCard key={a.slug} article={a} />
+            ))}
           </div>
         </section>
       )}

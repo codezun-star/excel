@@ -197,4 +197,25 @@
   .prose-legal strong {
     @apply text-foreground;
   }
+  .prose-article {
+    @apply text-[1.0625rem] leading-relaxed text-foreground;
+  }
+  .prose-article h2 {
+    @apply mt-12 mb-4 font-heading text-2xl font-extrabold tracking-tight;
+  }
+  .prose-article h3 {
+    @apply mt-8 mb-2 font-heading text-lg font-bold;
+  }
+  .prose-article p {
+    @apply my-4 text-foreground/85;
+  }
+  .prose-article ul {
+    @apply my-4 list-disc space-y-2 pl-6 text-foreground/85;
+  }
+  .prose-article ol {
+    @apply my-4 list-decimal space-y-2 pl-6 text-foreground/85;
+  }
+  .prose-article li::marker {
+    @apply text-brand;
+  }
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { LogoMark } from "@/components/brand/logo";
 import { es } from "@/i18n/es";
+import { ARTICLES } from "@/content/blog";
 import { SITE } from "@/lib/site";
 import { CATEGORIES } from "@/templates/categories";
 
@@ -15,7 +16,7 @@ const LEGAL = [
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t bg-muted/40">
-      <div className="container-page grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="container-page grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-5">
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <LogoMark />
@@ -31,6 +32,7 @@ export function SiteFooter() {
           links={[
             { href: "/plantillas", label: "Todas las plantillas" },
             { href: "/precios", label: "Precios" },
+            { href: "/blog", label: "Guías y blog" },
             { href: "/#como-funciona", label: "Cómo funciona" },
             { href: "/cuenta", label: "Mi cuenta" },
           ]}
@@ -40,6 +42,13 @@ export function SiteFooter() {
           links={CATEGORIES.slice(0, 6).map((c) => ({
             href: `/plantillas?categoria=${c.id}`,
             label: c.name,
+          }))}
+        />
+        <FooterColumn
+          title="Guías populares"
+          links={ARTICLES.slice(0, 6).map((a) => ({
+            href: `/blog/${a.slug}`,
+            label: a.seoTitle.replace(/ \(.*\)$/, "").replace(/ 2026.*$/, ""),
           }))}
         />
         <FooterColumn title="Legal" links={LEGAL} />

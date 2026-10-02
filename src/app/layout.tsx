@@ -34,7 +34,10 @@ export const metadata: Metadata = {
     description: SITE.description,
   },
   twitter: { card: "summary_large_image" },
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", types: { "application/rss+xml": "/blog/rss.xml" } },
+  // Señales geográficas: el mercado principal es Honduras.
+  other: { "geo.region": "HN", "geo.placename": "Honduras", "content-language": "es-HN" },
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
@@ -46,7 +49,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning className={`${inter.variable} ${manrope.variable}`}>
+    <html lang="es-HN" suppressHydrationWarning className={`${inter.variable} ${manrope.variable}`}>
       <body className="flex min-h-dvh flex-col">
         <ThemeProvider>
           <SiteHeader />
