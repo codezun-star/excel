@@ -53,3 +53,54 @@ describe("cálculos de los artículos", () => {
     expect(noticeDays(2, ctx)).toBe(1);
   });
 });
+
+describe("liquidación, ISV y amortización", () => {
+  it("liquidación del ejemplo de la guía (despido injustificado)", async () => {
+    const { computeLiquidation } = await import("./calc");
+    const liq = computeLiquidation(
+      {
+        start: "2022-03-01",
+        end: "2026-09-30",
+        salary: 18000,
+        averageSalary: 18500,
+        reasonId: "despido-injustificado",
+      },
+      ctx,
+    );
+    expect(liq).toMatchObject({
+      d360: 1650,
+      notice: 37000,
+      severance: 84791.67,
+      vacation: 7000,
+      d13: 13500,
+      d14: 4500,
+      total: 146791.67,
+    });
+    const quit = computeLiquidation(
+      {
+        start: "2022-03-01",
+        end: "2026-09-30",
+        salary: 18000,
+        averageSalary: 18500,
+        reasonId: "renuncia",
+      },
+      ctx,
+    );
+    expect(quit.notice + quit.severance).toBe(0);
+    expect(quit.total).toBe(25000);
+  });
+
+  it("ISV agregado o incluido", async () => {
+    const { salesTaxBreakdown } = await import("./calc");
+    expect(salesTaxBreakdown(1000, 0.15, false)).toEqual({ subtotal: 1000, tax: 150, total: 1150 });
+    expect(salesTaxBreakdown(1150, 0.15, true)).toEqual({ subtotal: 1000, tax: 150, total: 1150 });
+  });
+
+  it("la tabla de amortización termina en saldo cero", async () => {
+    const { amortizationSchedule } = await import("./calc");
+    const t = amortizationSchedule(200000, 0.18, 36);
+    expect(t.rows).toHaveLength(36);
+    expect(t.rows.at(-1)!.balance).toBe(0);
+    expect(t.totalInterest).toBeCloseTo(7230.48 * 36 - 200000, 0);
+  });
+});

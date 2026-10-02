@@ -5,6 +5,7 @@ export const es = {
     categories: "Categorías",
     pricing: "Precios",
     blog: "Guías",
+    calculators: "Calculadoras",
     howItWorks: "Cómo funciona",
     account: "Mi cuenta",
     login: "Ingresar",

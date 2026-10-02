@@ -10,7 +10,7 @@ import { UserMenu } from "./user-menu";
 
 export const NAV_LINKS = [
   { href: "/plantillas", label: es.nav.templates },
-  { href: "/#categorias", label: es.nav.categories },
+  { href: "/hn/calculadoras", label: es.nav.calculators },
   { href: "/blog", label: es.nav.blog },
   { href: "/precios", label: es.nav.pricing },
 ] as const;

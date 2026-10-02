@@ -77,3 +77,19 @@ describe("blog", () => {
     }
   });
 });
+
+describe("calculadoras", () => {
+  it("cada calculadora apunta a una plantilla lista y a una guía existente", async () => {
+    const { CALCULATORS } = await import("@/content/calculators");
+    const { getArticle } = await import(".");
+    const slugs = CALCULATORS.map((c) => c.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const c of CALCULATORS) {
+      expect(getTemplateMeta(c.template)?.status, c.slug).toBe("ready");
+      expect(getArticle(c.guide), c.slug).toBeDefined();
+      expect(c.seoTitle.length, c.slug).toBeLessThanOrEqual(65);
+      expect(c.description.length, c.slug).toBeGreaterThanOrEqual(110);
+      expect(c.description.length, c.slug).toBeLessThanOrEqual(170);
+    }
+  });
+});

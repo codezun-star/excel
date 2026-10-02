@@ -115,3 +115,98 @@ export function vacationDaysFor(serviceYear: number, ctx: CountryContext): numbe
 export function salesTaxRate(ctx: CountryContext, id: string): number {
   return ctx.taxes.salesTax.rates.find((r) => r.id === id)?.rate ?? 0;
 }
+
+export interface LiquidationInput {
+  start: string;
+  end: string;
+  /** Salario ordinario mensual (vacaciones y décimos) */
+  salary: number;
+  /** Salario promedio de los últimos 6 meses (preaviso y cesantía) */
+  averageSalary: number;
+  reasonId: string;
+  /** Días de vacaciones ganadas y no gozadas de años anteriores */
+  pendingVacationDays?: number;
+}
+
+/** Liquidación laboral con la misma lógica de la plantilla de prestaciones. */
+export function computeLiquidation(input: LiquidationInput, ctx: CountryContext) {
+  const basis = ctx.labor.dayBasis;
+  const start = utc(input.start);
+  const end = utc(input.end);
+  const d360 = end < start ? 0 : days360Inclusive(start, end);
+  const years = Math.floor(d360 / basis);
+  const months = Math.floor(d360 / 30);
+  const reason = ctx.labor.terminationReasons.find((r) => r.id === input.reasonId);
+  const dailyAvg = input.averageSalary / 30;
+  const dailyOrd = input.salary / 30;
+  const nDays = reason?.notice ? noticeDays(months, ctx) : 0;
+  const notice = round2(nDays * dailyAvg);
+  const sev = ctx.labor.severance;
+  let severance = 0;
+  if (reason?.severance) {
+    if (months < 12) {
+      const row = [...sev.underOneYear].reverse().find((r) => months >= r.fromMonths);
+      severance = round2((row?.value ?? 0) * dailyAvg);
+    } else {
+      severance = round2(
+        Math.min(sev.maxMonths, (d360 / basis) * sev.monthsPerYear) * input.averageSalary,
+      );
+    }
+  }
+  const vacEntitled = vacationDaysFor(years + 1, ctx);
+  const vacDays = ((d360 - years * basis) / basis) * vacEntitled;
+  const vacation = round2(vacDays * dailyOrd);
+  const vacationPending = round2((input.pendingVacationDays ?? 0) * dailyOrd);
+  const y = end.getUTCFullYear();
+  const t = ctx.labor.thirteenthMonth.periodStart;
+  const f = ctx.labor.fourteenthMonth.periodStart;
+  const start13 = new Date(Date.UTC(y, t.month - 1, t.day));
+  let start14 = new Date(Date.UTC(y, f.month - 1, f.day));
+  if (end < start14) start14 = new Date(Date.UTC(y - 1, f.month - 1, f.day));
+  const from13 = start > start13 ? start : start13;
+  const from14 = start > start14 ? start : start14;
+  const d13 =
+    end < from13 ? 0 : proportionalBonus(input.salary, days360Inclusive(from13, end), ctx);
+  const d14 =
+    end < from14 ? 0 : proportionalBonus(input.salary, days360Inclusive(from14, end), ctx);
+  const total = round2(notice + severance + vacation + vacationPending + d13 + d14);
+  return {
+    d360,
+    years,
+    months,
+    reason,
+    noticeDays: nDays,
+    notice,
+    severance,
+    vacationDays: round2(vacDays),
+    vacation,
+    vacationPending,
+    d13,
+    d14,
+    total,
+  };
+}
+
+/** Separa o agrega el ISV a un monto. */
+export function salesTaxBreakdown(amount: number, rate: number, included: boolean) {
+  const subtotal = included ? round2(amount / (1 + rate)) : round2(amount);
+  const tax = included ? round2(amount - subtotal) : round2(amount * rate);
+  return { subtotal, tax, total: round2(subtotal + tax) };
+}
+
+/** Tabla de amortización con cuota nivelada. */
+export function amortizationSchedule(principal: number, annualRate: number, months: number) {
+  const payment = monthlyPayment(principal, annualRate, months);
+  const r = annualRate / 12;
+  let balance = principal;
+  const rows: { n: number; payment: number; interest: number; capital: number; balance: number }[] =
+    [];
+  for (let n = 1; n <= months; n++) {
+    const interest = round2(balance * r);
+    const pay = n === months ? round2(balance + interest) : payment;
+    const capital = round2(pay - interest);
+    balance = round2(balance - capital);
+    rows.push({ n, payment: pay, interest, capital, balance: Math.max(0, balance) });
+  }
+  return { payment, rows, totalInterest: round2(rows.reduce((s, x) => s + x.interest, 0)) };
+}

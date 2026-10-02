@@ -1,12 +1,4 @@
-import {
-  days360Inclusive,
-  fmtL,
-  noticeDays,
-  proportionalBonus,
-  round2,
-  utc,
-  vacationDaysFor,
-} from "../calc";
+import { computeLiquidation, fmtL, round2 } from "../calc";
 import type { Article } from "../types";
 
 export const prestaciones: Article = {
@@ -50,25 +42,22 @@ export const prestaciones: Article = {
     },
   ],
   body: (ctx) => {
-    const start = "2022-03-01";
-    const end = "2026-09-30";
     const salary = 18000;
     const avg = 18500;
-    const d360 = days360Inclusive(utc(start), utc(end));
-    const years = Math.floor(d360 / ctx.labor.dayBasis);
-    const months = Math.floor(d360 / 30);
-    const nDays = noticeDays(months, ctx);
-    const notice = round2((nDays * avg) / 30);
-    const sev = ctx.labor.severance;
-    const severance = round2(
-      Math.min(sev.maxMonths, (d360 / ctx.labor.dayBasis) * sev.monthsPerYear) * avg,
+    const liq = computeLiquidation(
+      {
+        start: "2022-03-01",
+        end: "2026-09-30",
+        salary,
+        averageSalary: avg,
+        reasonId: "despido-injustificado",
+      },
+      ctx,
     );
-    const vacEntitled = vacationDaysFor(years + 1, ctx);
-    const vacDays = ((d360 - years * ctx.labor.dayBasis) / ctx.labor.dayBasis) * vacEntitled;
-    const vacation = round2(vacDays * (salary / 30));
-    const d13 = proportionalBonus(salary, days360Inclusive(utc("2026-01-01"), utc(end)), ctx);
-    const d14 = proportionalBonus(salary, days360Inclusive(utc("2026-07-01"), utc(end)), ctx);
-    const total = round2(notice + severance + vacation + d13 + d14);
+    const { d360, years, notice, severance, vacation, d13, d14, total } = liq;
+    const nDays = liq.noticeDays;
+    const vacDays = liq.vacationDays;
+    const sev = ctx.labor.severance;
     const reasons = ctx.labor.terminationReasons;
     return [
       {

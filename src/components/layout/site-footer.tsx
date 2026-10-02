@@ -33,6 +33,7 @@ export function SiteFooter() {
             { href: "/plantillas", label: "Todas las plantillas" },
             { href: "/precios", label: "Precios" },
             { href: "/blog", label: "Guías y blog" },
+            { href: "/hn/calculadoras", label: "Calculadoras gratis" },
             { href: "/#como-funciona", label: "Cómo funciona" },
             { href: "/cuenta", label: "Mi cuenta" },
           ]}

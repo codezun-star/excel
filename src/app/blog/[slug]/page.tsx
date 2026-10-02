@@ -17,6 +17,7 @@ import {
   relatedArticles,
 } from "@/content/blog";
 import { fmtDate } from "@/content/blog/calc";
+import { calculatorPath, calculatorsFor } from "@/content/calculators";
 import { requireCountryContext } from "@/countries";
 import { articleJsonLd, articleMetadata, BLOG_AUTHOR } from "@/lib/blog-seo";
 import { getTemplateMeta } from "@/templates/catalog";
@@ -46,6 +47,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
     .map((s) => getTemplateMeta(s))
     .filter((m): m is TemplateMeta => Boolean(m && m.status === "ready"));
   const related = relatedArticles(article);
+  const calculators = calculatorsFor({ guide: article.slug });
 
   return (
     <div className="container-page py-10">
@@ -94,11 +96,23 @@ export default async function ArticlePage({ params }: { params: Params }) {
           {article.regulated && (
             <div className="mt-6">
               <LegalNotice
+                subject="Guía"
                 ctx={ctx}
                 kind={article.category === "planilla" ? "laboral" : "fiscal"}
               />
             </div>
           )}
+
+          {calculators.map((c) => (
+            <Link
+              key={c.slug}
+              href={calculatorPath(c.slug)}
+              className="mt-6 flex items-center justify-between gap-3 rounded-xl border border-brand/40 bg-brand-soft p-4 text-sm font-semibold hover:border-brand"
+            >
+              <span>¿Prefieres el resultado directo? Usa la {c.title.toLowerCase()} (gratis)</span>
+              <span aria-hidden>→</span>
+            </Link>
+          ))}
 
           <div className="mt-8">
             <ArticleBody blocks={blocks} />

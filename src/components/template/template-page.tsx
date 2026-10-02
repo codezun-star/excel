@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { articlesForTemplate } from "@/content/blog";
+import { calculatorPath, calculatorsFor } from "@/content/calculators";
 import type { CountryContext } from "@/countries";
 import { templateJsonLd } from "@/lib/seo";
 import { getCategory } from "@/templates/categories";
@@ -22,6 +23,7 @@ export function TemplatePage({ meta, ctx }: { meta: TemplateMeta; ctx: CountryCo
   const category = getCategory(meta.category);
   const related = relatedTemplates(meta, 4);
   const guides = articlesForTemplate(meta.slug);
+  const calculators = ctx.code === "HN" ? calculatorsFor({ template: meta.slug }) : [];
   return (
     <div className="container-page py-8">
       <JsonLd data={templateJsonLd(meta, ctx)} />
@@ -122,6 +124,19 @@ export function TemplatePage({ meta, ctx }: { meta: TemplateMeta; ctx: CountryCo
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Entiende el cálculo antes de usar la plantilla, con ejemplos en lempiras.
+            {calculators.length > 0 && " ¿Un solo caso? Prueba la "}
+            {calculators.map((c, i) => (
+              <span key={c.slug}>
+                {i > 0 && " o la "}
+                <Link
+                  href={calculatorPath(c.slug)}
+                  className="font-medium text-brand-strong underline"
+                >
+                  {c.title.toLowerCase()}
+                </Link>
+              </span>
+            ))}
+            {calculators.length > 0 && "."}
           </p>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {guides.map((a) => (

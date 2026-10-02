@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/site";
 import { canonicalTemplatePath } from "@/lib/seo";
 import { ARTICLES, BLOG_CATEGORIES } from "@/content/blog";
+import { CALCULATORS, calculatorPath } from "@/content/calculators";
 import { CATALOG } from "@/templates/catalog";
 
 /** Sitemap dinámico desde el registro de plantillas (solo URL canónicas de plantillas listas). */
@@ -64,5 +65,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     })),
   ];
-  return [...pages, ...templates, ...blog];
+  const calculators: MetadataRoute.Sitemap = [
+    {
+      url: absoluteUrl("/hn/calculadoras"),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    ...CALCULATORS.map((c) => ({
+      url: absoluteUrl(calculatorPath(c.slug)),
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
+  ];
+  return [...pages, ...templates, ...blog, ...calculators];
 }

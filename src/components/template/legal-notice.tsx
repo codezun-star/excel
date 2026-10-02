@@ -15,13 +15,22 @@ function formatDate(iso: string) {
 }
 
 /** Aviso legal y fecha de revisión para plantillas fiscales y laborales. */
-export function LegalNotice({ ctx, kind }: { ctx: CountryContext; kind: "fiscal" | "laboral" }) {
+export function LegalNotice({
+  ctx,
+  kind,
+  subject = "Plantilla",
+}: {
+  ctx: CountryContext;
+  kind: "fiscal" | "laboral";
+  /** Qué se está mostrando: Plantilla, Calculadora o Guía */
+  subject?: "Plantilla" | "Calculadora" | "Guía";
+}) {
   return (
     <div className="space-y-3">
       <Alert variant="info">
         <ScaleIcon />
         <AlertTitle>
-          Plantilla {kind === "fiscal" ? "fiscal" : "laboral"} — herramienta de apoyo
+          {subject} {kind === "fiscal" ? "fiscal" : "laboral"} — herramienta de apoyo
         </AlertTitle>
         <AlertDescription>
           <p>
@@ -46,8 +55,11 @@ export function LegalNotice({ ctx, kind }: { ctx: CountryContext; kind: "fiscal"
           <AlertTriangleIcon />
           <AlertTitle>Valores pendientes de verificación oficial</AlertTitle>
           <AlertDescription>
-            Las tasas y montos de esta plantilla aún no se han confirmado con las publicaciones
-            oficiales. Revísalos en la hoja Parámetros antes de usarlos.
+            Las tasas y montos de esta {subject.toLowerCase()} aún no se han confirmado con las
+            publicaciones oficiales.{" "}
+            {subject === "Plantilla"
+              ? "Revísalos en la hoja Parámetros antes de usarlos."
+              : "Verifícalos con las fuentes oficiales antes de usarlos."}
           </AlertDescription>
         </Alert>
       )}
