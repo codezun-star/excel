@@ -51,8 +51,4 @@ export function setActiveSheet(wb: ExcelJS.Workbook, index = 0): void {
   ];
 }
 
-/** Nombre de archivo sugerido para la descarga. */
-export function workbookFileName(slug: string, ctx: CountryContext, suffix?: string): string {
-  const extra = suffix ? `-${suffix}` : "";
-  return `${slug}-${ctx.slug}${extra}.xlsx`;
-}
+export { workbookFileName } from "./filename";
