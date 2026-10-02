@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { AccountNav } from "@/components/account/account-nav";
 import { AccountTabs } from "@/components/account/account-tabs";
 import { ProfileForm } from "@/components/account/profile-form";
 import { EmptyState, SavedConfigs, type SavedConfigItem } from "@/components/account/saved-configs";
@@ -15,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getUserEntitlements } from "@/lib/billing/entitlements";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getCurrentUser } from "@/lib/supabase/server";
 import { canonicalTemplatePath } from "@/lib/seo";
@@ -42,7 +44,7 @@ export default async function AccountPage() {
   const [{ data: profile }, { data: configs }, { data: downloads }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("full_name, country, plan, created_at")
+      .select("full_name, country, created_at")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -56,6 +58,8 @@ export default async function AccountPage() {
       .order("created_at", { ascending: false })
       .limit(50),
   ]);
+
+  const entitlements = await getUserEntitlements(user.id);
 
   const items: SavedConfigItem[] = (configs ?? []).flatMap((c) => {
     const meta = getTemplateMeta(c.template_slug as string);
@@ -82,14 +86,16 @@ export default async function AccountPage() {
           {(profile?.full_name as string | null) ?? user.email}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Plan:{" "}
-          <strong className="text-foreground">{profile?.plan === "pro" ? "Pro" : "Gratis"}</strong>{" "}
-          ·{" "}
-          <Link href="/precios" className="font-medium text-brand-strong hover:underline">
-            Ver planes
+          Plan: <strong className="text-foreground">{entitlements.planName}</strong> ·{" "}
+          <Link
+            href={entitlements.plan === "free" ? "/precios" : "/cuenta/suscripcion"}
+            className="font-medium text-brand-strong hover:underline"
+          >
+            {entitlements.plan === "free" ? "Ver planes" : "Administrar"}
           </Link>
         </p>
       </header>
+      <AccountNav showClients={entitlements.limits.clientProfiles > 1} />
       <AccountTabs
         tabs={[
           {

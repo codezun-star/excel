@@ -12,7 +12,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "¿Necesito crear una cuenta para descargar?",
-    a: "No. Puedes configurar y descargar las plantillas gratis sin registrarte. La cuenta sirve para guardar tus configuraciones y volver a usarlas.",
+    a: "No. Puedes descargar hasta 3 plantillas gratis al mes sin registrarte. Con una cuenta gratis tienes 5 descargas al mes y tu historial; con Pro, todas las plantillas y configuraciones guardadas.",
   },
   {
     q: "¿Mis datos se envían a algún servidor?",
@@ -32,10 +32,10 @@ export const FAQ_ITEMS = [
   },
 ];
 
-export function Faq() {
+export function Faq({ items = FAQ_ITEMS }: { items?: { q: string; a: string }[] }) {
   return (
     <Accordion type="single" collapsible className="rounded-xl border bg-card px-5">
-      {FAQ_ITEMS.map((item, i) => (
+      {items.map((item, i) => (
         <AccordionItem key={item.q} value={`item-${i}`}>
           <AccordionTrigger>{item.q}</AccordionTrigger>
           <AccordionContent>{item.a}</AccordionContent>
