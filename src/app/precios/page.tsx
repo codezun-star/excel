@@ -16,7 +16,7 @@ import { providerOptions } from "@/payments/registry";
 export const metadata: Metadata = {
   title: "Precios y planes | Excel Codezun",
   description:
-    "Plan Gratis, Pro y Negocio/Contador. Plantillas de Excel con fórmulas reales para Honduras y Latinoamérica. Paga con tarjeta, PayPal o transferencia.",
+    "Plan Gratis, Pro y Negocio/Contador. Plantillas de Excel con fórmulas reales para Honduras y Latinoamérica. Paga con tarjeta o transferencia a BAC, Atlántida o Promerica.",
   alternates: { canonical: "/precios" },
 };
 
