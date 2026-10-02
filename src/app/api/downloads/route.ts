@@ -6,7 +6,7 @@ import { defaultUsageStore } from "@/lib/billing/usage";
 import { authorizeDownload } from "@/lib/downloads/authorize";
 import { buildOptionsFor } from "@/lib/downloads/build-options";
 import { recordDownload } from "@/lib/downloads/record";
-import { resolveRequester } from "@/lib/downloads/requester";
+import { resolveBrand, resolveRequester } from "@/lib/downloads/requester";
 import { clientIp, rateLimit, rateLimitHeaders } from "@/lib/rate-limit";
 import { getTemplateMeta } from "@/templates/catalog";
 
@@ -16,6 +16,7 @@ export const dynamic = "force-dynamic";
 const bodySchema = z.object({
   slug: z.string().regex(/^[a-z0-9-]{2,80}$/),
   country: z.string().refine(isCountryCode, "País no válido").default("HN"),
+  clientProfileId: z.string().uuid().nullish(),
 });
 
 /**
@@ -71,7 +72,10 @@ export async function POST(request: Request) {
   });
   return NextResponse.json({
     ok: true,
-    buildOptions: buildOptionsFor(requester.entitlements),
+    buildOptions: buildOptionsFor(
+      requester.entitlements,
+      await resolveBrand(requester, body.data.clientProfileId),
+    ),
     usage: {
       used: decision.usage.used,
       limit: decision.limit,

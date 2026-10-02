@@ -12,12 +12,13 @@ export interface GenerateDeps {
   anonId: string | null;
   usage: UsageStore;
   brand?: { name: string; footer?: string | null } | null;
+  source?: "server" | "batch";
   record?: (input: {
     userId: string | null;
     anonId: string | null;
     templateSlug: string;
     country: string;
-    source: "server";
+    source: "server" | "batch";
   }) => Promise<void>;
 }
 
@@ -81,7 +82,7 @@ export async function generateWorkbookForRequest(
       anonId: deps.anonId,
       templateSlug: slug,
       country: prepared.ctx.code,
-      source: "server",
+      source: deps.source ?? "server",
     })
     .catch(() => undefined);
   return {

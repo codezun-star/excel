@@ -1,6 +1,6 @@
 "use client";
 
-import { DownloadIcon, Loader2Icon, RotateCcwIcon, SaveIcon } from "lucide-react";
+import { DownloadIcon, Layers3Icon, Loader2Icon, RotateCcwIcon, SaveIcon } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -12,6 +12,11 @@ import { Paywall, type PaywallReason } from "@/components/billing/paywall";
 import { UsageBanner } from "@/components/billing/usage-banner";
 import { useAccess } from "@/components/billing/use-access";
 import { DynamicForm } from "@/components/config-form/dynamic-form";
+import {
+  BatchDownloadDialog,
+  ClientProfileSelect,
+  useClientProfiles,
+} from "@/components/template/client-profile-tools";
 import { useSessionUser } from "@/components/layout/user-menu";
 import { WorkbookPreview } from "@/components/preview/workbook-preview";
 import { Button } from "@/components/ui/button";
@@ -32,6 +37,7 @@ import { downloadBlob, downloadWorkbook } from "@/lib/excel/download";
 import type { PreviewData } from "@/lib/excel/preview";
 import { workbookToPreview } from "@/lib/excel/preview";
 import { workbookFileName } from "@/lib/excel/filename";
+import { applyClientProfile } from "@/lib/billing/client-profile";
 import type { BuildOptions } from "@/lib/excel/workbook";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import { loadClientBuilder, loadTemplateForm } from "@/lib/templates-client";
@@ -72,6 +78,9 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
   const proLocked = !(access?.limits.customLogo ?? false);
   const watermark = access?.limits.watermark ?? true;
   const lockedPro = tier === "pro" && access?.access === "none";
+  const profiles = useClientProfiles(Boolean(user) && (access?.limits.clientProfiles ?? 0) > 0);
+  const [clientProfileId, setClientProfileId] = useState<string | null>(null);
+  const [batchOpen, setBatchOpen] = useState(false);
 
   const [form, setForm] = useState<AnyTemplateForm | null>(null);
   const [initial, setInitial] = useState<FieldValues | null>(null);
@@ -222,7 +231,7 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
         const auth = await fetch("/api/downloads", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ slug, country }),
+          body: JSON.stringify({ slug, country, clientProfileId }),
         });
         const data = (await auth.json().catch(() => ({}))) as {
           buildOptions?: BuildOptions;
@@ -244,7 +253,7 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
         const res = await fetch(`/api/generate/${slug}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ config: values, country }),
+          body: JSON.stringify({ config: values, country, clientProfileId }),
         });
         if (!res.ok) {
           const data = (await res.json().catch(() => ({}))) as {
@@ -314,6 +323,21 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
             {es.workspace.reset}
           </Button>
         </div>
+        {(access?.limits.clientProfiles ?? 0) > 0 && user ? (
+          <ClientProfileSelect
+            profiles={profiles}
+            value={clientProfileId}
+            onChange={(profile) => {
+              setClientProfileId(profile?.id ?? null);
+              if (!profile) return;
+              const next = applyClientProfile(form, valuesRef.current, profile);
+              setInitial(next);
+              valuesRef.current = next;
+              setFormKey((k) => k + 1);
+              toast.success(`Datos de «${profile.name}» aplicados`);
+            }}
+          />
+        ) : null}
         <DynamicForm
           key={formKey}
           form={form}
@@ -349,6 +373,17 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
             </div>
           )}
           <UsageBanner access={access} className="mt-3" />
+          {access?.limits.batchDownload && profiles.length > 1 && !lockedPro ? (
+            <Button
+              variant="secondary"
+              className="mt-3 w-full"
+              onClick={() => setBatchOpen(true)}
+              disabled={invalid}
+            >
+              <Layers3Icon />
+              Descargar para varios clientes
+            </Button>
+          ) : null}
           <p className="mt-3 text-xs text-muted-foreground">{es.workspace.formulaHint}</p>
           <div className="mt-4 hidden gap-2 sm:flex">
             <Button
@@ -408,6 +443,14 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
           } else toast.error(res.error);
         }}
         next={`${typeof window === "undefined" ? "" : window.location.pathname}`}
+      />
+      <BatchDownloadDialog
+        open={batchOpen}
+        onOpenChange={setBatchOpen}
+        profiles={profiles}
+        slug={slug}
+        country={country}
+        getConfig={() => valuesRef.current}
       />
       <Paywall
         open={paywall !== null}
