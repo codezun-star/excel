@@ -45,6 +45,12 @@ import { meta as cajasDeAhorroCooperativas } from "../comunidad/cajas-de-ahorro-
 import { meta as controlDeAlquileres } from "../bienes-raices/control-de-alquileres/meta";
 import { meta as notasYPromedios } from "../educacion/notas-y-promedios/meta";
 import { meta as pensionesYMensualidades } from "../educacion/pensiones-y-mensualidades/meta";
+import { meta as prestamosAEmpleados } from "../planilla/prestamos-a-empleados/meta";
+import { meta as comisionesYBonos } from "../planilla/comisiones-y-bonos/meta";
+import { meta as evaluacionDeDesempeno } from "../planilla/evaluacion-de-desempeno/meta";
+import { meta as inventarioPorLoteVencimiento } from "../inventario/inventario-por-lote-vencimiento/meta";
+import { meta as pedidosYEntregas } from "../inventario/pedidos-y-entregas/meta";
+import { meta as ventasPorWhatsapp } from "../inventario/ventas-por-whatsapp/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -100,4 +106,10 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   controlDeAlquileres,
   notasYPromedios,
   pensionesYMensualidades,
+  prestamosAEmpleados,
+  comisionesYBonos,
+  evaluacionDeDesempeno,
+  inventarioPorLoteVencimiento,
+  pedidosYEntregas,
+  ventasPorWhatsapp,
 ];

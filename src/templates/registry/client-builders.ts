@@ -53,4 +53,11 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
   "notas-y-promedios": () => import("../educacion/notas-y-promedios/build").then((m) => m.build),
   "pensiones-y-mensualidades": () =>
     import("../educacion/pensiones-y-mensualidades/build").then((m) => m.build),
+  "prestamos-a-empleados": () =>
+    import("../planilla/prestamos-a-empleados/build").then((m) => m.build),
+  "evaluacion-de-desempeno": () =>
+    import("../planilla/evaluacion-de-desempeno/build").then((m) => m.build),
+  "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas/build").then((m) => m.build),
+  "ventas-por-whatsapp": () =>
+    import("../inventario/ventas-por-whatsapp/build").then((m) => m.build),
 };

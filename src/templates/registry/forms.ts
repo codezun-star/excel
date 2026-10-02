@@ -76,4 +76,13 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
   "notas-y-promedios": () => import("../educacion/notas-y-promedios/form").then((m) => m.form),
   "pensiones-y-mensualidades": () =>
     import("../educacion/pensiones-y-mensualidades/form").then((m) => m.form),
+  "prestamos-a-empleados": () =>
+    import("../planilla/prestamos-a-empleados/form").then((m) => m.form),
+  "comisiones-y-bonos": () => import("../planilla/comisiones-y-bonos/form").then((m) => m.form),
+  "evaluacion-de-desempeno": () =>
+    import("../planilla/evaluacion-de-desempeno/form").then((m) => m.form),
+  "inventario-por-lote-vencimiento": () =>
+    import("../inventario/inventario-por-lote-vencimiento/form").then((m) => m.form),
+  "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas/form").then((m) => m.form),
+  "ventas-por-whatsapp": () => import("../inventario/ventas-por-whatsapp/form").then((m) => m.form),
 };

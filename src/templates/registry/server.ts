@@ -72,6 +72,14 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
   "notas-y-promedios": () => import("../educacion/notas-y-promedios").then((m) => m.default),
   "pensiones-y-mensualidades": () =>
     import("../educacion/pensiones-y-mensualidades").then((m) => m.default),
+  "prestamos-a-empleados": () => import("../planilla/prestamos-a-empleados").then((m) => m.default),
+  "comisiones-y-bonos": () => import("../planilla/comisiones-y-bonos").then((m) => m.default),
+  "evaluacion-de-desempeno": () =>
+    import("../planilla/evaluacion-de-desempeno").then((m) => m.default),
+  "inventario-por-lote-vencimiento": () =>
+    import("../inventario/inventario-por-lote-vencimiento").then((m) => m.default),
+  "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas").then((m) => m.default),
+  "ventas-por-whatsapp": () => import("../inventario/ventas-por-whatsapp").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

@@ -1,4 +1,3 @@
-import { ALL_EMPLOYERS } from "./categories";
 import { comingSoon } from "./define";
 import type { TemplateMeta } from "./types";
 
@@ -30,36 +29,8 @@ export const COMING_SOON: TemplateMeta[] = [
   }),
 
   // ---------------------------------------------------------------- Planilla
-  comingSoon("planilla", {
-    slug: "evaluacion-de-desempeno",
-    title: "Evaluación de desempeño",
-    shortDescription: "Evaluación por competencias con ponderaciones y calificación final.",
-    tier: "free",
-    businessTypes: ALL_EMPLOYERS,
-  }),
-  comingSoon("planilla", {
-    slug: "prestamos-a-empleados",
-    title: "Préstamos a empleados",
-    shortDescription: "Control de préstamos y adelantos con cuotas descontadas en planilla.",
-    tier: "free",
-    businessTypes: ALL_EMPLOYERS,
-  }),
-  comingSoon("planilla", {
-    slug: "comisiones-y-bonos",
-    title: "Comisiones y bonos",
-    shortDescription: "Cálculo de comisiones escalonadas y bonos por cumplimiento.",
-    tier: "pro",
-    businessTypes: ["comercio", "servicios", "tienda-ropa", "ferreteria"],
-  }),
 
   // ---------------------------------------------------------------- Inventario
-  comingSoon("inventario", {
-    slug: "inventario-por-lote-vencimiento",
-    title: "Inventario por lote y vencimiento",
-    shortDescription: "Lotes con fecha de vencimiento y alertas de productos por vencer.",
-    tier: "pro",
-    businessTypes: ["farmacia", "pulperia", "comercio", "cafeteria-panaderia"],
-  }),
   comingSoon("inventario", {
     slug: "mercaderia-en-consignacion",
     title: "Mercadería en consignación",
@@ -67,21 +38,6 @@ export const COMING_SOON: TemplateMeta[] = [
       "Productos recibidos o entregados en consignación con ventas y liquidaciones.",
     tier: "pro",
     businessTypes: ["comercio", "tienda-ropa"],
-  }),
-  comingSoon("inventario", {
-    slug: "pedidos-y-entregas",
-    title: "Pedidos y entregas",
-    shortDescription: "Seguimiento de pedidos con estado, fecha de entrega, anticipos y saldos.",
-    tier: "free",
-    businessTypes: ["comercio", "cafeteria-panaderia", "restaurante", "tienda-ropa"],
-  }),
-  comingSoon("inventario", {
-    slug: "ventas-por-whatsapp",
-    title: "Ventas por WhatsApp",
-    shortDescription:
-      "Registro de pedidos por WhatsApp y redes con envíos, pagos y clientes frecuentes.",
-    tier: "free",
-    businessTypes: ["comercio", "tienda-ropa", "cafeteria-panaderia"],
   }),
   comingSoon("inventario", {
     slug: "costos-de-importacion-aduana",
