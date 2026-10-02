@@ -79,6 +79,15 @@ import { meta as contratoDeArrendamiento } from "../bienes-raices/contrato-de-ar
 import { meta as gastosDePropiedades } from "../bienes-raices/gastos-de-propiedades/meta";
 import { meta as rentabilidadInmobiliaria } from "../bienes-raices/rentabilidad-inmobiliaria/meta";
 import { meta as ventasDeLotesAPlazos } from "../bienes-raices/ventas-de-lotes-a-plazos/meta";
+import { meta as asistenciaEscolar } from "../educacion/asistencia-escolar/meta";
+import { meta as horarioDeClases } from "../educacion/horario-de-clases/meta";
+import { meta as planificadorDeEstudio } from "../educacion/planificador-de-estudio/meta";
+import { meta as pagosDeAcademias } from "../educacion/pagos-de-academias/meta";
+import { meta as citasYPacientes } from "../salud/citas-y-pacientes/meta";
+import { meta as historialDeConsultas } from "../salud/historial-de-consultas/meta";
+import { meta as medicamentosYVencimientos } from "../salud/medicamentos-y-vencimientos/meta";
+import { meta as seguimientoDeSalud } from "../salud/seguimiento-de-salud/meta";
+import { meta as planificadorDeComidasYRutinas } from "../salud/planificador-de-comidas-y-rutinas/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -168,4 +177,13 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   gastosDePropiedades,
   rentabilidadInmobiliaria,
   ventasDeLotesAPlazos,
+  asistenciaEscolar,
+  horarioDeClases,
+  planificadorDeEstudio,
+  pagosDeAcademias,
+  citasYPacientes,
+  historialDeConsultas,
+  medicamentosYVencimientos,
+  seguimientoDeSalud,
+  planificadorDeComidasYRutinas,
 ];

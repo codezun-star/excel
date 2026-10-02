@@ -130,4 +130,17 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
     import("../bienes-raices/rentabilidad-inmobiliaria/form").then((m) => m.form),
   "ventas-de-lotes-a-plazos": () =>
     import("../bienes-raices/ventas-de-lotes-a-plazos/form").then((m) => m.form),
+  "asistencia-escolar": () => import("../educacion/asistencia-escolar/form").then((m) => m.form),
+  "horario-de-clases": () => import("../educacion/horario-de-clases/form").then((m) => m.form),
+  "planificador-de-estudio": () =>
+    import("../educacion/planificador-de-estudio/form").then((m) => m.form),
+  "pagos-de-academias": () => import("../educacion/pagos-de-academias/form").then((m) => m.form),
+  "citas-y-pacientes": () => import("../salud/citas-y-pacientes/form").then((m) => m.form),
+  "historial-de-consultas": () =>
+    import("../salud/historial-de-consultas/form").then((m) => m.form),
+  "medicamentos-y-vencimientos": () =>
+    import("../salud/medicamentos-y-vencimientos/form").then((m) => m.form),
+  "seguimiento-de-salud": () => import("../salud/seguimiento-de-salud/form").then((m) => m.form),
+  "planificador-de-comidas-y-rutinas": () =>
+    import("../salud/planificador-de-comidas-y-rutinas/form").then((m) => m.form),
 };

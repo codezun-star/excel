@@ -122,6 +122,18 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
     import("../bienes-raices/rentabilidad-inmobiliaria").then((m) => m.default),
   "ventas-de-lotes-a-plazos": () =>
     import("../bienes-raices/ventas-de-lotes-a-plazos").then((m) => m.default),
+  "asistencia-escolar": () => import("../educacion/asistencia-escolar").then((m) => m.default),
+  "horario-de-clases": () => import("../educacion/horario-de-clases").then((m) => m.default),
+  "planificador-de-estudio": () =>
+    import("../educacion/planificador-de-estudio").then((m) => m.default),
+  "pagos-de-academias": () => import("../educacion/pagos-de-academias").then((m) => m.default),
+  "citas-y-pacientes": () => import("../salud/citas-y-pacientes").then((m) => m.default),
+  "historial-de-consultas": () => import("../salud/historial-de-consultas").then((m) => m.default),
+  "medicamentos-y-vencimientos": () =>
+    import("../salud/medicamentos-y-vencimientos").then((m) => m.default),
+  "seguimiento-de-salud": () => import("../salud/seguimiento-de-salud").then((m) => m.default),
+  "planificador-de-comidas-y-rutinas": () =>
+    import("../salud/planificador-de-comidas-y-rutinas").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

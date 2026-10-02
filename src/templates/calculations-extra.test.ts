@@ -41,6 +41,12 @@ function paragraphStarting(
   throw new Error(`No se encontró un párrafo que empiece con "${prefix}"`);
 }
 
+/** Número de serie de Excel de una fecha ISO. */
+const serial = (iso: string) =>
+  (Date.parse(`${iso}T00:00:00Z`) - Date.UTC(1899, 11, 30)) / 86_400_000;
+const isoFromToday = (days: number) =>
+  new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
+
 const pmt = (principal: number, monthlyRate: number, months: number) =>
   monthlyRate === 0
     ? principal / months
@@ -575,5 +581,237 @@ describe("cálculos de plantillas (segunda ola)", () => {
       "Vencida",
       "Vencida",
     ]);
+  });
+
+  it("asistencia-escolar: conteos, porcentaje por alumno y resumen anual", async () => {
+    const { wb, ev } = await buildExample("asistencia-escolar");
+    expect(tableRow(wb, ev, "Febrero", "Alumno", "Luis Fernando Reyes")).toMatchObject({
+      Asistió: 6,
+      Ausencias: 4,
+      "Días registrados": 10,
+      "% asistencia": 0.6,
+    });
+    expect(tableRow(wb, ev, "Febrero", "Alumno", "Carlos Eduardo López")).toMatchObject({
+      Asistió: 9,
+      Tardanzas: 1,
+      Justificadas: 1,
+      "% asistencia": 0.9,
+    });
+    expect(tableRow(wb, ev, "Febrero", "Alumno", "Presentes del día")).toBeDefined();
+    expect(tableRow(wb, ev, "Resumen", "Alumno", "Luis Fernando Reyes")).toMatchObject({
+      "Ausencias del año": 4,
+      "% del año": 0.6,
+      Situación: "En riesgo",
+    });
+    expect(tableRow(wb, ev, "Resumen", "Alumno", "Ana Sofía Martínez")).toMatchObject({
+      "% del año": 1,
+      Situación: "Bien",
+    });
+    expect(valueRightOf(wb, ev, "Resumen", "Alumnos en riesgo")).toBe(1);
+  });
+
+  it("horario-de-clases: horas con recreo y carga por materia y docente", async () => {
+    const { wb, ev } = await buildExample("horario-de-clases");
+    const subjects = [
+      "Español",
+      "Matemáticas",
+      "Ciencias Naturales",
+      "Ciencias Sociales",
+      "Inglés",
+      "Educación Física",
+      "Educación Artística",
+      "Computación",
+      "Formación Ciudadana",
+    ];
+    const count = new Map<string, number>();
+    for (let p = 1; p <= 7; p++)
+      for (let d = 0; d < 5; d++)
+        count.set(subjects[(p + d * 2) % 9]!, (count.get(subjects[(p + d * 2) % 9]!) ?? 0) + 1);
+    const times = columnBelow(wb, ev, "1.º grado", "Hora", 5);
+    expect(times[0]).toBe("7:00 - 7:45");
+    expect(times[4]).toBe("9:45 - 10:30");
+    expect(tableRow(wb, ev, "Materias", "Materia", "Matemáticas")).toMatchObject({
+      "Periodos por semana": count.get("Matemáticas"),
+      "Horas por semana": (count.get("Matemáticas")! * 45) / 60,
+    });
+    const zavala = [0, 3, 6].reduce((acc, i) => acc + (count.get(subjects[i]!) ?? 0), 0);
+    expect(tableRow(wb, ev, "Materias", "Nombre del docente", "Prof. Zavala")).toMatchObject({
+      "Materias que imparte": 3,
+      "Periodos por semana": zavala,
+    });
+  });
+
+  it("planificador-de-estudio: avance semanal, horario y entregas atrasadas", async () => {
+    const { wb, ev } = await buildExample("planificador-de-estudio");
+    const subjects = ["Matemáticas", "Español", "Química", "Historia de Honduras", "Inglés"];
+    let planned = 0;
+    for (const h of [15, 16, 19])
+      for (let d = 0; d < 5; d++) if (subjects[(d + h) % 5] === "Matemáticas") planned++;
+    expect(tableRow(wb, ev, "Materias", "Materia", "Matemáticas")).toMatchObject({
+      "Planificadas en el horario": planned,
+      "Estudiadas esta semana": 1,
+      "Avance de la meta": 0.25,
+      "Horas en total": 2.5,
+      Pendientes: 1,
+    });
+    expect(valueRightOf(wb, ev, "Materias", "Horas estudiadas esta semana")).toBe(1.75);
+    expect(valueRightOf(wb, ev, "Materias", "Entregas atrasadas")).toBe(1);
+  });
+
+  it("pagos-de-academias: cuota con beca, morosos y resultado", async () => {
+    const { wb, ev } = await buildExample("pagos-de-academias");
+    expect(tableRow(wb, ev, "Alumnos y pagos", "Alumno", "Diego Núñez")).toMatchObject({
+      Cuota: 600,
+      Inscripción: 500,
+      "Total pagado": 2300,
+      Estado: "Al día",
+    });
+    expect(tableRow(wb, ev, "Alumnos y pagos", "Alumno", "Valeria Turcios")).toMatchObject({
+      "Saldo pendiente": 2000,
+      Estado: "Moroso",
+    });
+    expect(tableRow(wb, ev, "Resumen", "Curso", "Inglés básico")).toMatchObject({
+      Alumnos: 2,
+      Cobrado: 6400,
+      Pendiente: 0,
+      Morosos: 0,
+    });
+    expect(tableRow(wb, ev, "Resumen", "Curso", "Guitarra")).toMatchObject({
+      Alumnos: 1,
+      Pendiente: 2000,
+      Morosos: 1,
+    });
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Enero")).toMatchObject({
+      Mensualidades: 2800,
+      "Materiales y eventos": 200,
+      Gastos: 2500,
+      Resultado: 500,
+    });
+    expect(valueRightOf(wb, ev, "Resumen", "Inscripciones cobradas")).toBe(1300);
+    expect(valueRightOf(wb, ev, "Resumen", "Resultado del año (con inscripciones)")).toBe(5400);
+  });
+
+  it("citas-y-pacientes: edad, saldos, agenda del día y profesionales", async () => {
+    const { wb, ev } = await buildExample("citas-y-pacientes");
+    const now = new Date();
+    const age =
+      now.getUTCFullYear() -
+      1985 -
+      (now.getUTCMonth() < 2 || (now.getUTCMonth() === 2 && now.getUTCDate() < 14) ? 1 : 0);
+    expect(tableRow(wb, ev, "Pacientes", "Código", "PAC-001")).toMatchObject({
+      Edad: age,
+      "Citas atendidas": 1,
+    });
+    expect(valueRightOf(wb, ev, "Agenda del día", "Citas del día")).toBe(2);
+    expect(columnBelow(wb, ev, "Agenda del día", "Paciente", 3)).toEqual([
+      "José Luis Andino",
+      "María Elena Rodríguez",
+      "",
+    ]);
+    expect(tableRow(wb, ev, "Resumen", "Profesional", "Dr. Castro")).toMatchObject({
+      Atendidas: 1,
+      Ingresos: 600,
+      "Por cobrar": 600,
+    });
+    expect(valueRightOf(wb, ev, "Resumen", "Saldo por cobrar")).toBe(600);
+  });
+
+  it("historial-de-consultas: IMC, estado del control y ficha del paciente", async () => {
+    const { wb, ev } = await buildExample("historial-de-consultas");
+    expect(columnBelow(wb, ev, "Consultas", "IMC", 3)).toEqual([30, 29.4, 26.7]);
+    expect(columnBelow(wb, ev, "Consultas", "Estado del control", 3)).toEqual([
+      "Atendido",
+      "Programado",
+      "Programado",
+    ]);
+    expect(valueRightOf(wb, ev, "Ficha del paciente", "Consultas registradas")).toBe(2);
+    expect(valueRightOf(wb, ev, "Ficha del paciente", "Próximo control")).toBe(
+      serial(isoFromToday(5)),
+    );
+    expect(valueRightOf(wb, ev, "Ficha del paciente", "Alergias")).toBe("Penicilina");
+    expect(columnBelow(wb, ev, "Ficha del paciente", "Presión", 3)).toEqual([
+      "132/84",
+      "150/95",
+      "",
+    ]);
+    expect(valueRightOf(wb, ev, "Resumen", "Controles en los próximos 7 días")).toBe(2);
+    expect(valueRightOf(wb, ev, "Resumen", "Controles vencidos sin nueva consulta")).toBe(0);
+  });
+
+  it("medicamentos-y-vencimientos: horarios, días que alcanza y alertas", async () => {
+    const { wb, ev } = await buildExample("medicamentos-y-vencimientos");
+    expect(tableRow(wb, ev, "Medicamentos", "Medicamento", "Metformina")).toMatchObject({
+      "Tomas al día": 2,
+      Horarios: "7:00  ·  19:00",
+      "Días que alcanza": 4,
+      Estado: "Comprar",
+    });
+    expect(tableRow(wb, ev, "Medicamentos", "Medicamento", "Acetaminofén")).toMatchObject({
+      "Unidades al día": 6,
+      "Días que alcanza": 5,
+      Estado: "Por vencer",
+    });
+    expect(tableRow(wb, ev, "Medicamentos", "Medicamento", "Losartán").Estado).toBe("Bien");
+    expect(tableRow(wb, ev, "Medicamentos", "Medicamento", "Salbutamol").Estado).toBe("Vencido");
+    expect(valueRightOf(wb, ev, "Resumen", "Por comprar")).toBe(1);
+    expect(tableRow(wb, ev, "Resumen", "Persona", "Papá")).toMatchObject({
+      Medicamentos: 2,
+      "Con alerta": 2,
+    });
+    expect(tableRow(wb, ev, "Compras", "Medicamento", "Losartán")["Precio por unidad"]).toBe(15);
+  });
+
+  it("seguimiento-de-salud: clasificación de presión, glucosa e IMC y promedios", async () => {
+    const { wb, ev } = await buildExample("seguimiento-de-salud");
+    expect(columnBelow(wb, ev, "Mediciones", "Presión", 3)).toEqual([
+      "Hipertensión 2",
+      "Hipertensión 1",
+      "Normal",
+    ]);
+    expect(columnBelow(wb, ev, "Mediciones", "Glucosa", 3)).toEqual([
+      "Prediabetes",
+      "Elevada",
+      "Normal",
+    ]);
+    expect(columnBelow(wb, ev, "Mediciones", "IMC", 3)).toEqual([30.5, "", 29.8]);
+    expect(columnBelow(wb, ev, "Mediciones", "Peso según IMC", 3)).toEqual([
+      "Obesidad",
+      "",
+      "Sobrepeso",
+    ]);
+    expect(columnBelow(wb, ev, "Mediciones", "Alerta", 3)).toEqual(["Sí", "", ""]);
+    expect(tableRow(wb, ev, "Resumen", "Persona", "Yo")).toMatchObject({
+      "Sistólica (30 días)": 129,
+      "Diastólica (30 días)": 83,
+      "Glucosa en ayunas (30 días)": 107,
+      "Alertas (30 días)": 1,
+    });
+  });
+
+  it("planificador-de-comidas-y-rutinas: costo de platillos, lista de compras y rutina", async () => {
+    const { wb, ev } = await buildExample("planificador-de-comidas-y-rutinas");
+    expect(tableRow(wb, ev, "Platillos", "Platillo", "Baleadas con huevo")).toMatchObject({
+      "Costo por preparación": 91,
+      "Veces en el menú": 4,
+      "Costo en la semana": 364,
+    });
+    expect(
+      tableRow(wb, ev, "Lista de compras", "Ingrediente", "Tortillas de harina"),
+    ).toMatchObject({ Necesitas: 88, Comprar: 88, "Costo estimado": 352 });
+    expect(tableRow(wb, ev, "Lista de compras", "Ingrediente", "Huevos")).toMatchObject({
+      Necesitas: 16,
+      Comprar: 10,
+      "Costo estimado": 45,
+    });
+    expect(tableRow(wb, ev, "Lista de compras", "Ingrediente", "Frijoles rojos")).toMatchObject({
+      Necesitas: 9,
+      Comprar: 8,
+    });
+    expect(valueRightOf(wb, ev, "Rutina", "Planificado vs. meta")).toBe(1);
+    expect(valueRightOf(wb, ev, "Rutina", "Cumplido vs. meta")).toBeCloseTo(80 / 150, 6);
+    expect(tableRow(wb, ev, "Rutina", "Tipo de actividad", "Fuerza")).toMatchObject({
+      "Minutos planificados": 60,
+      "Minutos cumplidos": 20,
+    });
   });
 });

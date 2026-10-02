@@ -52,33 +52,6 @@ export const COMING_SOON: TemplateMeta[] = [
   // ---------------------------------------------------------------- Negocios
 
   // ---------------------------------------------------------------- Educación
-  comingSoon("educacion", {
-    slug: "asistencia-escolar",
-    title: "Asistencia escolar",
-    shortDescription: "Lista de asistencia mensual con porcentaje por alumno.",
-    tier: "free",
-    businessTypes: ["escuela"],
-  }),
-  comingSoon("educacion", {
-    slug: "horario-de-clases",
-    title: "Horario de clases",
-    shortDescription: "Horario semanal por grado o docente listo para imprimir.",
-    tier: "free",
-    businessTypes: ["escuela"],
-  }),
-  comingSoon("educacion", {
-    slug: "planificador-de-estudio",
-    title: "Planificador de estudio",
-    shortDescription: "Plan semanal de estudio con metas y seguimiento.",
-    tier: "free",
-  }),
-  comingSoon("educacion", {
-    slug: "pagos-de-academias",
-    title: "Pagos de academias",
-    shortDescription: "Inscripciones, mensualidades y materiales de academias y cursos.",
-    tier: "free",
-    businessTypes: ["escuela"],
-  }),
 
   // ---------------------------------------------------------------- Finanzas personales
 
@@ -133,39 +106,4 @@ export const COMING_SOON: TemplateMeta[] = [
   }),
 
   // ---------------------------------------------------------------- Salud
-  comingSoon("salud", {
-    slug: "citas-y-pacientes",
-    title: "Citas y pacientes",
-    shortDescription: "Agenda de citas con pacientes, motivo, estado y cobro.",
-    tier: "free",
-    businessTypes: ["clinica"],
-  }),
-  comingSoon("salud", {
-    slug: "historial-de-consultas",
-    title: "Historial de consultas",
-    shortDescription: "Historial por paciente con diagnóstico, tratamiento y seguimiento.",
-    tier: "free",
-    businessTypes: ["clinica"],
-  }),
-  comingSoon("salud", {
-    slug: "medicamentos-y-vencimientos",
-    title: "Medicamentos y vencimientos",
-    shortDescription: "Medicamentos con dosis, horarios, existencias y fechas de vencimiento.",
-    tier: "free",
-    businessTypes: ["clinica", "farmacia", "hogar"],
-  }),
-  comingSoon("salud", {
-    slug: "seguimiento-de-salud",
-    title: "Seguimiento de salud",
-    shortDescription: "Presión, glucosa, peso y otros indicadores con alertas.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("salud", {
-    slug: "planificador-de-comidas-y-rutinas",
-    title: "Planificador de comidas y rutinas",
-    shortDescription: "Menú semanal, lista de compras y rutina de ejercicio.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
 ];

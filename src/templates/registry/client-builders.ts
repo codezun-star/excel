@@ -93,4 +93,17 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
     import("../bienes-raices/contrato-de-arrendamiento/build").then((m) => m.build),
   "gastos-de-propiedades": () =>
     import("../bienes-raices/gastos-de-propiedades/build").then((m) => m.build),
+  "asistencia-escolar": () => import("../educacion/asistencia-escolar/build").then((m) => m.build),
+  "horario-de-clases": () => import("../educacion/horario-de-clases/build").then((m) => m.build),
+  "planificador-de-estudio": () =>
+    import("../educacion/planificador-de-estudio/build").then((m) => m.build),
+  "pagos-de-academias": () => import("../educacion/pagos-de-academias/build").then((m) => m.build),
+  "citas-y-pacientes": () => import("../salud/citas-y-pacientes/build").then((m) => m.build),
+  "historial-de-consultas": () =>
+    import("../salud/historial-de-consultas/build").then((m) => m.build),
+  "medicamentos-y-vencimientos": () =>
+    import("../salud/medicamentos-y-vencimientos/build").then((m) => m.build),
+  "seguimiento-de-salud": () => import("../salud/seguimiento-de-salud/build").then((m) => m.build),
+  "planificador-de-comidas-y-rutinas": () =>
+    import("../salud/planificador-de-comidas-y-rutinas/build").then((m) => m.build),
 };
