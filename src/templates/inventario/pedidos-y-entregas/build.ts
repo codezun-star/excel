@@ -6,18 +6,12 @@ import { makeTheme } from "@/lib/excel/styles";
 import { addTable } from "@/lib/excel/table";
 import { DEFAULT_BUILD_OPTIONS, createWorkbook, setActiveSheet } from "@/lib/excel/workbook";
 import { titleWith } from "@/templates/shared/ledger-form";
-import { correlativeId } from "@/templates/shared/register";
+import { correlativeId, fromToday } from "@/templates/shared/register";
 import type { TemplateBuild } from "@/templates/types";
 
 import type { PedidosConfig } from "./form";
 
 const STATES = ["Pendiente", "En proceso", "Listo", "Entregado", "Cancelado"];
-
-function fromToday(days: number): string {
-  const d = new Date();
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
 
 export const build: TemplateBuild<PedidosConfig> = async (
   config,

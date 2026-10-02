@@ -60,4 +60,9 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
   "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas/build").then((m) => m.build),
   "ventas-por-whatsapp": () =>
     import("../inventario/ventas-por-whatsapp/build").then((m) => m.build),
+  pulperia: () => import("../negocios/pulperia/build").then((m) => m.build),
+  "taller-mecanico": () => import("../negocios/taller-mecanico/build").then((m) => m.build),
+  "barberia-salon": () => import("../negocios/barberia-salon/build").then((m) => m.build),
+  "transporte-taxis": () => import("../negocios/transporte-taxis/build").then((m) => m.build),
+  ferreteria: () => import("../negocios/ferreteria/build").then((m) => m.build),
 };

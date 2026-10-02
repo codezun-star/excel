@@ -85,4 +85,11 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
     import("../inventario/inventario-por-lote-vencimiento/form").then((m) => m.form),
   "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas/form").then((m) => m.form),
   "ventas-por-whatsapp": () => import("../inventario/ventas-por-whatsapp/form").then((m) => m.form),
+  pulperia: () => import("../negocios/pulperia/form").then((m) => m.form),
+  "taller-mecanico": () => import("../negocios/taller-mecanico/form").then((m) => m.form),
+  "barberia-salon": () => import("../negocios/barberia-salon/form").then((m) => m.form),
+  "transporte-taxis": () => import("../negocios/transporte-taxis/form").then((m) => m.form),
+  ferreteria: () => import("../negocios/ferreteria/form").then((m) => m.form),
+  "restaurante-costos-recetas": () =>
+    import("../negocios/restaurante-costos-recetas/form").then((m) => m.form),
 };

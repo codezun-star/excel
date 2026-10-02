@@ -51,6 +51,12 @@ import { meta as evaluacionDeDesempeno } from "../planilla/evaluacion-de-desempe
 import { meta as inventarioPorLoteVencimiento } from "../inventario/inventario-por-lote-vencimiento/meta";
 import { meta as pedidosYEntregas } from "../inventario/pedidos-y-entregas/meta";
 import { meta as ventasPorWhatsapp } from "../inventario/ventas-por-whatsapp/meta";
+import { meta as pulperia } from "../negocios/pulperia/meta";
+import { meta as tallerMecanico } from "../negocios/taller-mecanico/meta";
+import { meta as barberiaSalon } from "../negocios/barberia-salon/meta";
+import { meta as transporteTaxis } from "../negocios/transporte-taxis/meta";
+import { meta as ferreteria } from "../negocios/ferreteria/meta";
+import { meta as restauranteCostosRecetas } from "../negocios/restaurante-costos-recetas/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -112,4 +118,10 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   inventarioPorLoteVencimiento,
   pedidosYEntregas,
   ventasPorWhatsapp,
+  pulperia,
+  tallerMecanico,
+  barberiaSalon,
+  transporteTaxis,
+  ferreteria,
+  restauranteCostosRecetas,
 ];

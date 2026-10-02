@@ -77,3 +77,19 @@ export function textField(
 export function correlativeId(prefix: string, guide: string, index: number): string {
   return `IF(${guide}="","","${prefix}"&RIGHT("000"&${index + 1},3))`;
 }
+
+/** Fecha ISO a `days` días de hoy (para que los ejemplos muestren alertas vigentes). */
+export function fromToday(days: number): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Fórmula de la columna de días del mes: la primera fila es el día 1 y cada
+ * fila suma un día hasta terminar el mes (las sobrantes quedan vacías).
+ */
+export function monthDayFormula(prev: string | null, yearCell: string, monthCell: string): string {
+  if (!prev) return `DATE(${yearCell},${monthCell},1)`;
+  return `IF(${prev}="","",IF(MONTH(${prev}+1)<>${monthCell},"",${prev}+1))`;
+}

@@ -80,6 +80,13 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
     import("../inventario/inventario-por-lote-vencimiento").then((m) => m.default),
   "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas").then((m) => m.default),
   "ventas-por-whatsapp": () => import("../inventario/ventas-por-whatsapp").then((m) => m.default),
+  pulperia: () => import("../negocios/pulperia").then((m) => m.default),
+  "taller-mecanico": () => import("../negocios/taller-mecanico").then((m) => m.default),
+  "barberia-salon": () => import("../negocios/barberia-salon").then((m) => m.default),
+  "transporte-taxis": () => import("../negocios/transporte-taxis").then((m) => m.default),
+  ferreteria: () => import("../negocios/ferreteria").then((m) => m.default),
+  "restaurante-costos-recetas": () =>
+    import("../negocios/restaurante-costos-recetas").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

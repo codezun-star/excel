@@ -51,54 +51,11 @@ export const COMING_SOON: TemplateMeta[] = [
 
   // ---------------------------------------------------------------- Negocios
   comingSoon("negocios", {
-    slug: "pulperia",
-    title: "Control para pulpería",
-    shortDescription:
-      "Ventas del día, compras a proveedores, fiados y ganancia diaria en un solo archivo.",
-    tier: "free",
-    businessTypes: ["pulperia"],
-  }),
-  comingSoon("negocios", {
-    slug: "restaurante-costos-recetas",
-    title: "Costos de recetas para restaurante",
-    shortDescription: "Costo por porción, precio sugerido y margen de cada platillo.",
-    tier: "pro",
-    businessTypes: ["restaurante", "cafeteria-panaderia"],
-  }),
-  comingSoon("negocios", {
-    slug: "taller-mecanico",
-    title: "Taller mecánico",
-    shortDescription: "Órdenes de trabajo con repuestos, mano de obra y estado de cada vehículo.",
-    tier: "free",
-    businessTypes: ["taller"],
-  }),
-  comingSoon("negocios", {
-    slug: "barberia-salon",
-    title: "Barbería y salón de belleza",
-    shortDescription: "Servicios del día por estilista con comisiones y propinas.",
-    tier: "free",
-    businessTypes: ["barberia-salon"],
-  }),
-  comingSoon("negocios", {
-    slug: "ferreteria",
-    title: "Control para ferretería",
-    shortDescription: "Inventario por categoría, cotizaciones rápidas y ventas al crédito.",
-    tier: "free",
-    businessTypes: ["ferreteria"],
-  }),
-  comingSoon("negocios", {
     slug: "farmacia",
     title: "Control para farmacia",
     shortDescription: "Medicamentos por lote, vencimientos y ventas diarias.",
     tier: "pro",
     businessTypes: ["farmacia"],
-  }),
-  comingSoon("negocios", {
-    slug: "transporte-taxis",
-    title: "Transporte y taxis",
-    shortDescription: "Ingresos diarios por unidad, combustible, mantenimiento y ganancia neta.",
-    tier: "free",
-    businessTypes: ["transporte"],
   }),
   comingSoon("negocios", {
     slug: "tienda-de-ropa",
