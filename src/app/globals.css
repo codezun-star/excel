@@ -173,3 +173,28 @@
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 }
+
+@layer components {
+  /* Texto largo (páginas legales) sin depender de plugins */
+  .prose-legal {
+    @apply max-w-3xl text-base leading-relaxed text-foreground;
+  }
+  .prose-legal h2 {
+    @apply mt-10 mb-3 text-xl font-bold;
+  }
+  .prose-legal h3 {
+    @apply mt-6 mb-2 text-lg font-semibold;
+  }
+  .prose-legal p {
+    @apply my-3 text-muted-foreground;
+  }
+  .prose-legal ul {
+    @apply my-3 list-disc space-y-1.5 pl-6 text-muted-foreground;
+  }
+  .prose-legal a {
+    @apply font-medium text-brand-strong underline underline-offset-2;
+  }
+  .prose-legal strong {
+    @apply text-foreground;
+  }
+}
