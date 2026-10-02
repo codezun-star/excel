@@ -50,55 +50,6 @@ export const COMING_SOON: TemplateMeta[] = [
   }),
 
   // ---------------------------------------------------------------- Negocios
-  comingSoon("negocios", {
-    slug: "farmacia",
-    title: "Control para farmacia",
-    shortDescription: "Medicamentos por lote, vencimientos y ventas diarias.",
-    tier: "pro",
-    businessTypes: ["farmacia"],
-  }),
-  comingSoon("negocios", {
-    slug: "tienda-de-ropa",
-    title: "Tienda de ropa",
-    shortDescription: "Inventario por talla y color, ventas y apartados.",
-    tier: "free",
-    businessTypes: ["tienda-ropa"],
-  }),
-  comingSoon("negocios", {
-    slug: "cafeteria-panaderia",
-    title: "Cafetería y panadería",
-    shortDescription: "Producción diaria, mermas, costos de insumos y ventas.",
-    tier: "free",
-    businessTypes: ["cafeteria-panaderia"],
-  }),
-  comingSoon("negocios", {
-    slug: "servicios-freelancers",
-    title: "Control para freelancers",
-    shortDescription: "Proyectos, horas trabajadas, cobros pendientes y ganancia por cliente.",
-    tier: "free",
-    businessTypes: ["freelancer", "servicios"],
-  }),
-  comingSoon("negocios", {
-    slug: "constructora-presupuesto-de-obra",
-    title: "Presupuesto de obra",
-    shortDescription: "Presupuesto por renglones con materiales, mano de obra, indirectos e ISV.",
-    tier: "pro",
-    businessTypes: ["constructora"],
-  }),
-  comingSoon("negocios", {
-    slug: "agricultura-cafe-ganaderia",
-    title: "Agricultura, café y ganadería",
-    shortDescription: "Costos de producción por manzana, cosecha, ventas y rentabilidad.",
-    tier: "free",
-    businessTypes: ["agro"],
-  }),
-  comingSoon("negocios", {
-    slug: "camaroneras-pesca",
-    title: "Camaroneras y pesca",
-    shortDescription: "Siembra, alimento, cosecha por estanque y rendimiento.",
-    tier: "pro",
-    businessTypes: ["pesca"],
-  }),
 
   // ---------------------------------------------------------------- Educación
   comingSoon("educacion", {

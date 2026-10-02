@@ -57,6 +57,13 @@ import { meta as barberiaSalon } from "../negocios/barberia-salon/meta";
 import { meta as transporteTaxis } from "../negocios/transporte-taxis/meta";
 import { meta as ferreteria } from "../negocios/ferreteria/meta";
 import { meta as restauranteCostosRecetas } from "../negocios/restaurante-costos-recetas/meta";
+import { meta as farmacia } from "../negocios/farmacia/meta";
+import { meta as tiendaDeRopa } from "../negocios/tienda-de-ropa/meta";
+import { meta as cafeteriaPanaderia } from "../negocios/cafeteria-panaderia/meta";
+import { meta as serviciosFreelancers } from "../negocios/servicios-freelancers/meta";
+import { meta as constructoraPresupuestoDeObra } from "../negocios/constructora-presupuesto-de-obra/meta";
+import { meta as agriculturaCafeGanaderia } from "../negocios/agricultura-cafe-ganaderia/meta";
+import { meta as camaronerasPesca } from "../negocios/camaroneras-pesca/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -124,4 +131,11 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   transporteTaxis,
   ferreteria,
   restauranteCostosRecetas,
+  farmacia,
+  tiendaDeRopa,
+  cafeteriaPanaderia,
+  serviciosFreelancers,
+  constructoraPresupuestoDeObra,
+  agriculturaCafeGanaderia,
+  camaronerasPesca,
 ];

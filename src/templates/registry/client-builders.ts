@@ -65,4 +65,10 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
   "barberia-salon": () => import("../negocios/barberia-salon/build").then((m) => m.build),
   "transporte-taxis": () => import("../negocios/transporte-taxis/build").then((m) => m.build),
   ferreteria: () => import("../negocios/ferreteria/build").then((m) => m.build),
+  "tienda-de-ropa": () => import("../negocios/tienda-de-ropa/build").then((m) => m.build),
+  "cafeteria-panaderia": () => import("../negocios/cafeteria-panaderia/build").then((m) => m.build),
+  "servicios-freelancers": () =>
+    import("../negocios/servicios-freelancers/build").then((m) => m.build),
+  "agricultura-cafe-ganaderia": () =>
+    import("../negocios/agricultura-cafe-ganaderia/build").then((m) => m.build),
 };

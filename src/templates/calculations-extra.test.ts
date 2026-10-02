@@ -169,4 +169,89 @@ describe("cálculos de plantillas (segunda ola)", () => {
       Revisión: "Subir precio",
     });
   });
+
+  it("farmacia: existencias por lote, vencimientos y valor en riesgo", async () => {
+    const { wb, ev } = await buildExample("farmacia");
+    expect(tableRow(wb, ev, "Lotes", "Lote", "A-1001")).toMatchObject({
+      Existencia: 18,
+      Estado: "OK",
+    });
+    expect(tableRow(wb, ev, "Lotes", "Lote", "X-2002")).toMatchObject({
+      Existencia: 9,
+      Estado: "Por vencer",
+    });
+    expect(tableRow(wb, ev, "Lotes", "Lote", "S-0501")).toMatchObject({
+      Existencia: 40,
+      Estado: "Vencido",
+    });
+    expect(valueRightOf(wb, ev, "Lotes", "Valor vencido o por vencer")).toBe(1560);
+  });
+
+  it("tienda-de-ropa: disponibles con ventas y apartados", async () => {
+    const { wb, ev } = await buildExample("tienda-de-ropa");
+    expect(tableRow(wb, ev, "Inventario", "Código", "BL-001-M")).toMatchObject({ Disponible: 4 });
+    expect(tableRow(wb, ev, "Inventario", "Código", "VS-020-S")).toMatchObject({
+      Apartado: 1,
+      Disponible: 1,
+    });
+    expect(valueRightOf(wb, ev, "Inventario", "Ventas registradas")).toBe(1540);
+    expect(valueRightOf(wb, ev, "Inventario", "Saldo de apartados activos")).toBe(550);
+  });
+
+  it("cafeteria-panaderia: merma, ventas y ganancia por producto", async () => {
+    const { wb, ev } = await buildExample("cafeteria-panaderia");
+    expect(tableRow(wb, ev, "Resumen", "Producto", "Pan francés")).toMatchObject({
+      Producido: 1000,
+      Vendido: 950,
+      "% de merma": 0.05,
+      Ventas: 2850,
+      Ganancia: 1650,
+    });
+    expect(valueRightOf(wb, ev, "Resumen", "Ganancia del mes")).toBe(3510);
+  });
+
+  it("servicios-freelancers: por hora, precio fijo, pendiente y ganancia por hora", async () => {
+    const { wb, ev } = await buildExample("servicios-freelancers");
+    expect(tableRow(wb, ev, "Proyectos", "Cliente", "Café El Aroma")).toMatchObject({
+      Horas: 10,
+      "A cobrar": 5000,
+      Pendiente: 2500,
+      "Ganancia por hora": 500,
+    });
+    expect(tableRow(wb, ev, "Proyectos", "Cliente", "Hotel Brisas")).toMatchObject({
+      Ganancia: 7400,
+    });
+    expect(valueRightOf(wb, ev, "Proyectos", "Pendiente de cobro")).toBe(2500);
+  });
+
+  it("constructora-presupuesto-de-obra: indirectos, utilidad, impuesto y avance", async () => {
+    const { wb, ev } = await buildExample("constructora-presupuesto-de-obra");
+    expect(valueRightOf(wb, ev, "Resumen", "Costo directo")).toBe(137400);
+    expect(valueRightOf(wb, ev, "Resumen", "Total del presupuesto")).toBeCloseTo(196406.43, 2);
+    expect(valueRightOf(wb, ev, "Resumen", "Avance físico-financiero")).toBeCloseTo(
+      28500 / 137400,
+      6,
+    );
+  });
+
+  it("agricultura-cafe-ganaderia: costo por manzana, rendimiento y ganancia", async () => {
+    const { wb, ev } = await buildExample("agricultura-cafe-ganaderia");
+    expect(valueRightOf(wb, ev, "Resumen", "Costo por manzana")).toBe(10000);
+    expect(valueRightOf(wb, ev, "Resumen", "Rendimiento (Quintal por manzana)")).toBe(20);
+    expect(valueRightOf(wb, ev, "Resumen", "Costo por quintal")).toBe(500);
+    expect(valueRightOf(wb, ev, "Resumen", "Ganancia de la temporada")).toBe(376000);
+  });
+
+  it("camaroneras-pesca: costo, FCR, rendimiento y días de cultivo", async () => {
+    const { wb, ev } = await buildExample("camaroneras-pesca");
+    expect(tableRow(wb, ev, "Estanques", "Estanque", "E-1")).toMatchObject({
+      "Alimento (lb)": 7000,
+      "Costo total": 156000,
+      Ganancia: 174000,
+      "Rendimiento (lb/ha)": 1200,
+      "Conversión alimenticia (FCR)": 1.17,
+      "Días de cultivo": 108,
+    });
+    expect(tableRow(wb, ev, "Estanques", "Estanque", "E-2")).toMatchObject({ Ganancia: 38500 });
+  });
 });
