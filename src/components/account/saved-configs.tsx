@@ -1,11 +1,12 @@
 "use client";
 
-import { FileSpreadsheetIcon, Trash2Icon } from "lucide-react";
+import { FileSpreadsheetIcon, RefreshCwIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
-import { deleteConfiguration } from "@/app/actions/configs";
+import { deleteConfiguration, refreshConfigRules } from "@/app/actions/configs";
 import { Button } from "@/components/ui/button";
 
 export interface SavedConfigItem {
@@ -14,10 +15,21 @@ export interface SavedConfigItem {
   templateTitle: string;
   href: string;
   updatedAt: string;
+  /** Se guardó con una versión de reglas anterior a la vigente */
   outdated?: boolean;
+  rulesVersion?: string | null;
+  currentRulesVersion?: string;
 }
 
-export function SavedConfigs({ items }: { items: SavedConfigItem[] }) {
+export function SavedConfigs({
+  items,
+  canUpdateRules = false,
+}: {
+  items: SavedConfigItem[];
+  /** Beneficio Pro: regenerar con las tasas nuevas en un clic */
+  canUpdateRules?: boolean;
+}) {
+  const router = useRouter();
   const [pending, start] = useTransition();
   if (!items.length) {
     return (
@@ -38,6 +50,33 @@ export function SavedConfigs({ items }: { items: SavedConfigItem[] }) {
               <p className="text-sm text-muted-foreground">
                 {item.templateTitle} · {new Date(item.updatedAt).toLocaleDateString("es-HN")}
               </p>
+              {item.outdated && (
+                <p className="mt-1.5 flex flex-wrap items-center gap-x-2 text-sm font-medium text-highlight-strong">
+                  <RefreshCwIcon className="size-3.5" aria-hidden />
+                  Hay una versión más reciente de tu plantilla
+                  {item.currentRulesVersion ? ` (reglas ${item.currentRulesVersion})` : ""}.
+                  {canUpdateRules ? (
+                    <button
+                      type="button"
+                      className="underline"
+                      disabled={pending}
+                      onClick={() =>
+                        start(async () => {
+                          const res = await refreshConfigRules(item.id);
+                          if (res.ok) router.push(`${item.href}?config=${item.id}`);
+                          else toast.error(res.error);
+                        })
+                      }
+                    >
+                      Regenerar con las tasas nuevas
+                    </button>
+                  ) : (
+                    <Link href="/precios" className="underline">
+                      Con Pro la regeneras en un clic
+                    </Link>
+                  )}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex gap-2">

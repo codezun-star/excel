@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getCountryContext, type CountryCode } from "@/countries";
 import { getUserEntitlements } from "@/lib/billing/entitlements";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { getCurrentUser } from "@/lib/supabase/server";
@@ -49,7 +50,7 @@ export default async function AccountPage() {
       .maybeSingle(),
     supabase
       .from("saved_configs")
-      .select("id, name, template_slug, updated_at")
+      .select("id, name, template_slug, country, rules_version, updated_at")
       .order("updated_at", { ascending: false })
       .limit(100),
     supabase
@@ -64,6 +65,8 @@ export default async function AccountPage() {
   const items: SavedConfigItem[] = (configs ?? []).flatMap((c) => {
     const meta = getTemplateMeta(c.template_slug as string);
     if (!meta) return [];
+    const current = getCountryContext(String(c.country) as CountryCode)?.rulesVersion;
+    const saved = (c.rules_version as string | null) ?? null;
     return [
       {
         id: c.id as string,
@@ -71,6 +74,10 @@ export default async function AccountPage() {
         templateTitle: meta.title,
         href: canonicalTemplatePath(meta),
         updatedAt: c.updated_at as string,
+        rulesVersion: saved,
+        currentRulesVersion: current,
+        // Solo importa en plantillas que usan tasas (reguladas) y si cambió la versión.
+        outdated: Boolean(meta.regulated && current && saved !== current),
       },
     ];
   });
@@ -114,7 +121,9 @@ export default async function AccountPage() {
           {
             id: "configuraciones",
             label: "Configuraciones",
-            content: <SavedConfigs items={items} />,
+            content: (
+              <SavedConfigs items={items} canUpdateRules={entitlements.limits.rateUpdates} />
+            ),
           },
           {
             id: "descargas",

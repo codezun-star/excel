@@ -96,3 +96,43 @@ export async function deleteConfiguration(id: string): Promise<ActionResult> {
   revalidatePath("/cuenta");
   return { ok: true };
 }
+
+/**
+ * Marca una configuración como actualizada a las reglas vigentes del país
+ * (beneficio Pro «actualizaciones de tasas»). La configuración se vuelve a
+ * validar con el esquema actual de la plantilla.
+ */
+export async function refreshConfigRules(id: string): Promise<ActionResult> {
+  if (!z.string().uuid().safeParse(id).success)
+    return { ok: false, error: "Identificador inválido" };
+  const session = await getCurrentUser();
+  if (!session) return { ok: false, error: "Sesión expirada", code: "login_required" };
+  const entitlements = await getUserEntitlements(session.user.id);
+  if (!entitlements.limits.rateUpdates)
+    return {
+      ok: false,
+      error: "Las actualizaciones de tasas son parte de Pro.",
+      code: "plan_required",
+    };
+  const db = createServiceSupabase();
+  if (!db) return { ok: false, error: "No disponible en este momento" };
+  const { data: row } = await db
+    .from("saved_configs")
+    .select("id, template_slug, country, config")
+    .eq("id", id)
+    .eq("user_id", session.user.id)
+    .maybeSingle();
+  if (!row) return { ok: false, error: "Configuración no encontrada" };
+  const loader = FORM_LOADERS[String(row.template_slug)];
+  const ctx = getCountryContext(String(row.country) as CountryCode);
+  if (!loader || !ctx) return { ok: false, error: "Plantilla no disponible" };
+  const form = await loader();
+  if (!form.configSchema.safeParse(row.config).success)
+    return {
+      ok: false,
+      error: "La plantilla cambió: ábrela, revisa los campos marcados y vuelve a guardar.",
+    };
+  await db.from("saved_configs").update({ rules_version: ctx.rulesVersion }).eq("id", id);
+  revalidatePath("/cuenta");
+  return { ok: true };
+}

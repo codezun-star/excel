@@ -24,7 +24,11 @@ describe("applyClientProfile", () => {
       string,
       unknown
     >;
-    const values = applyClientProfile(form, { ...defaults, phone: "+504 2222-2222" }, profile);
+    const values: Record<string, unknown> = applyClientProfile(
+      form,
+      { ...defaults, phone: "+504 2222-2222" },
+      profile,
+    );
     expect(values.businessName).toBe("Ferretería El Martillo");
     expect(values.taxId).toBe("08011999123456");
     expect(values.address).toBe("Barrio Abajo, Tegucigalpa");
