@@ -96,6 +96,18 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
   "agricultura-cafe-ganaderia": () =>
     import("../negocios/agricultura-cafe-ganaderia").then((m) => m.default),
   "camaroneras-pesca": () => import("../negocios/camaroneras-pesca").then((m) => m.default),
+  "deudas-y-tarjetas": () =>
+    import("../finanzas-personales/deudas-y-tarjetas").then((m) => m.default),
+  "ahorro-por-metas": () =>
+    import("../finanzas-personales/ahorro-por-metas").then((m) => m.default),
+  "comprar-vs-alquilar": () =>
+    import("../finanzas-personales/comprar-vs-alquilar").then((m) => m.default),
+  jubilacion: () => import("../finanzas-personales/jubilacion").then((m) => m.default),
+  "pagos-de-servicios": () =>
+    import("../finanzas-personales/pagos-de-servicios").then((m) => m.default),
+  "presupuesto-de-bodas-eventos": () =>
+    import("../finanzas-personales/presupuesto-de-bodas-eventos").then((m) => m.default),
+  "lista-del-super": () => import("../finanzas-personales/lista-del-super").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

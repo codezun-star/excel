@@ -64,6 +64,13 @@ import { meta as serviciosFreelancers } from "../negocios/servicios-freelancers/
 import { meta as constructoraPresupuestoDeObra } from "../negocios/constructora-presupuesto-de-obra/meta";
 import { meta as agriculturaCafeGanaderia } from "../negocios/agricultura-cafe-ganaderia/meta";
 import { meta as camaronerasPesca } from "../negocios/camaroneras-pesca/meta";
+import { meta as deudasYTarjetas } from "../finanzas-personales/deudas-y-tarjetas/meta";
+import { meta as ahorroPorMetas } from "../finanzas-personales/ahorro-por-metas/meta";
+import { meta as comprarVsAlquilar } from "../finanzas-personales/comprar-vs-alquilar/meta";
+import { meta as jubilacion } from "../finanzas-personales/jubilacion/meta";
+import { meta as pagosDeServicios } from "../finanzas-personales/pagos-de-servicios/meta";
+import { meta as presupuestoDeBodasEventos } from "../finanzas-personales/presupuesto-de-bodas-eventos/meta";
+import { meta as listaDelSuper } from "../finanzas-personales/lista-del-super/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -138,4 +145,11 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   constructoraPresupuestoDeObra,
   agriculturaCafeGanaderia,
   camaronerasPesca,
+  deudasYTarjetas,
+  ahorroPorMetas,
+  comprarVsAlquilar,
+  jubilacion,
+  pagosDeServicios,
+  presupuestoDeBodasEventos,
+  listaDelSuper,
 ];

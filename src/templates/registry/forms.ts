@@ -102,4 +102,17 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
   "agricultura-cafe-ganaderia": () =>
     import("../negocios/agricultura-cafe-ganaderia/form").then((m) => m.form),
   "camaroneras-pesca": () => import("../negocios/camaroneras-pesca/form").then((m) => m.form),
+  "deudas-y-tarjetas": () =>
+    import("../finanzas-personales/deudas-y-tarjetas/form").then((m) => m.form),
+  "ahorro-por-metas": () =>
+    import("../finanzas-personales/ahorro-por-metas/form").then((m) => m.form),
+  "comprar-vs-alquilar": () =>
+    import("../finanzas-personales/comprar-vs-alquilar/form").then((m) => m.form),
+  jubilacion: () => import("../finanzas-personales/jubilacion/form").then((m) => m.form),
+  "pagos-de-servicios": () =>
+    import("../finanzas-personales/pagos-de-servicios/form").then((m) => m.form),
+  "presupuesto-de-bodas-eventos": () =>
+    import("../finanzas-personales/presupuesto-de-bodas-eventos/form").then((m) => m.form),
+  "lista-del-super": () =>
+    import("../finanzas-personales/lista-del-super/form").then((m) => m.form),
 };

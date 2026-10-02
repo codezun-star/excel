@@ -81,56 +81,6 @@ export const COMING_SOON: TemplateMeta[] = [
   }),
 
   // ---------------------------------------------------------------- Finanzas personales
-  comingSoon("finanzas-personales", {
-    slug: "deudas-y-tarjetas",
-    title: "Deudas y tarjetas",
-    shortDescription:
-      "Control de deudas y tarjetas con plan bola de nieve y fecha estimada de pago.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "ahorro-por-metas",
-    title: "Ahorro por metas",
-    shortDescription: "Metas de ahorro con aportes mensuales, avance y fecha estimada.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "comprar-vs-alquilar",
-    title: "Comprar o alquilar vivienda",
-    shortDescription: "Compara el costo total de comprar contra alquilar a varios años.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "jubilacion",
-    title: "Plan de jubilación",
-    shortDescription: "Proyección de ahorro para el retiro con aportes e intereses.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "pagos-de-servicios",
-    title: "Pagos de servicios",
-    shortDescription: "Energía, agua, internet, teléfono y más: vencimientos y pagos por mes.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "presupuesto-de-bodas-eventos",
-    title: "Presupuesto de bodas y eventos",
-    shortDescription: "Presupuesto por rubro, proveedores, anticipos e invitados.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
-  comingSoon("finanzas-personales", {
-    slug: "lista-del-super",
-    title: "Lista del súper",
-    shortDescription: "Lista de compras por pasillo con precios estimados y total.",
-    tier: "free",
-    businessTypes: ["hogar"],
-  }),
 
   // ---------------------------------------------------------------- Comunidad
   comingSoon("comunidad", {

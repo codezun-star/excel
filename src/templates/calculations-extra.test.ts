@@ -254,4 +254,78 @@ describe("cálculos de plantillas (segunda ola)", () => {
     });
     expect(tableRow(wb, ev, "Estanques", "Estanque", "E-2")).toMatchObject({ Ganancia: 38500 });
   });
+
+  it("deudas-y-tarjetas: orden bola de nieve, extra y meses para pagar", async () => {
+    const { wb, ev } = await buildExample("deudas-y-tarjetas");
+    expect(tableRow(wb, ev, "Deudas", "Deuda", "Tarjeta tienda")).toMatchObject({
+      "Orden de pago": 1,
+      "Pago con extra": 1100,
+      "Meses para pagar": 7,
+    });
+    expect(tableRow(wb, ev, "Deudas", "Deuda", "Tarjeta Banco A")).toMatchObject({
+      "Interés del mes": 810,
+      "Orden de pago": 2,
+      "Meses para pagar": 26,
+    });
+    expect(tableRow(wb, ev, "Deudas", "Deuda", "Préstamo cooperativa")).toMatchObject({
+      "Meses para pagar": 27,
+    });
+    expect(valueRightOf(wb, ev, "Deudas", "Deuda total")).toBe(69000);
+  });
+
+  it("ahorro-por-metas: aportes, retiros, avance y faltante", async () => {
+    const { wb, ev } = await buildExample("ahorro-por-metas");
+    expect(tableRow(wb, ev, "Metas", "Meta", "Fondo de emergencia")).toMatchObject({
+      Ahorrado: 5000,
+      Falta: 25000,
+    });
+    expect(tableRow(wb, ev, "Metas", "Meta", "Viaje a Roatán")).toMatchObject({
+      Ahorrado: 2000,
+      Falta: 10000,
+    });
+    expect(valueRightOf(wb, ev, "Metas", "Total ahorrado")).toBe(7000);
+  });
+
+  it("comprar-vs-alquilar: cuota del préstamo y comparación", async () => {
+    const { wb, ev } = await buildExample("comprar-vs-alquilar");
+    const loan = 1_800_000 * 0.9;
+    const r = 0.11 / 12;
+    const pmt = (loan * r) / (1 - Math.pow(1 + r, -240));
+    expect(valueRightOf(wb, ev, "Comparación", "Cuota mensual")).toBeCloseTo(pmt, 1);
+    expect(["Comprar", "Alquilar"]).toContain(valueRightOf(wb, ev, "Comparación", "Conviene"));
+  });
+
+  it("jubilacion: renta mensual igual a PAGO sobre el ahorro acumulado", async () => {
+    const { wb, ev } = await buildExample("jubilacion");
+    const final = Number(valueRightOf(wb, ev, "Proyección", "Ahorro acumulado"));
+    expect(final).toBeGreaterThan(20000);
+    const r = 0.07 / 12;
+    const income = (final * r) / (1 - Math.pow(1 + r, -240));
+    expect(valueRightOf(wb, ev, "Proyección", "Renta mensual posible")).toBeCloseTo(income, 1);
+  });
+
+  it("pagos-de-servicios: totales y promedios por servicio", async () => {
+    const { wb, ev } = await buildExample("pagos-de-servicios");
+    expect(tableRow(wb, ev, "Servicios", "Servicio", "Energía eléctrica")).toMatchObject({
+      "Total del año": 3750,
+      "Promedio mensual": 1250,
+    });
+    expect(valueRightOf(wb, ev, "Servicios", "Gastado en el año")).toBe(7460);
+  });
+
+  it("presupuesto-de-bodas-eventos: saldos, disponible y costo por persona", async () => {
+    const { wb, ev } = await buildExample("presupuesto-de-bodas-eventos");
+    expect(valueRightOf(wb, ev, "Presupuesto", "Falta por pagar")).toBe(55000);
+    expect(valueRightOf(wb, ev, "Presupuesto", "Disponible del presupuesto")).toBe(55000);
+    expect(valueRightOf(wb, ev, "Presupuesto", "Costo por persona confirmada")).toBe(9500);
+    expect(valueRightOf(wb, ev, "Invitados", "Personas confirmadas")).toBe(10);
+  });
+
+  it("lista-del-super: estimado, gastado y pendientes", async () => {
+    const { wb, ev } = await buildExample("lista-del-super");
+    expect(valueRightOf(wb, ev, "Lista", "Total estimado")).toBe(282);
+    expect(valueRightOf(wb, ev, "Lista", "Gastado hasta ahora")).toBe(160);
+    expect(valueRightOf(wb, ev, "Lista", "Te queda del presupuesto")).toBe(3840);
+    expect(valueRightOf(wb, ev, "Lista", "Productos por comprar")).toBe(1);
+  });
 });

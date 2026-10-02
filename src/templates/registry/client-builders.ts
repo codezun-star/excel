@@ -71,4 +71,17 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
     import("../negocios/servicios-freelancers/build").then((m) => m.build),
   "agricultura-cafe-ganaderia": () =>
     import("../negocios/agricultura-cafe-ganaderia/build").then((m) => m.build),
+  "deudas-y-tarjetas": () =>
+    import("../finanzas-personales/deudas-y-tarjetas/build").then((m) => m.build),
+  "ahorro-por-metas": () =>
+    import("../finanzas-personales/ahorro-por-metas/build").then((m) => m.build),
+  "comprar-vs-alquilar": () =>
+    import("../finanzas-personales/comprar-vs-alquilar/build").then((m) => m.build),
+  jubilacion: () => import("../finanzas-personales/jubilacion/build").then((m) => m.build),
+  "pagos-de-servicios": () =>
+    import("../finanzas-personales/pagos-de-servicios/build").then((m) => m.build),
+  "presupuesto-de-bodas-eventos": () =>
+    import("../finanzas-personales/presupuesto-de-bodas-eventos/build").then((m) => m.build),
+  "lista-del-super": () =>
+    import("../finanzas-personales/lista-del-super/build").then((m) => m.build),
 };
