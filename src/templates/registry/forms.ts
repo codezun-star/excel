@@ -143,4 +143,16 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
   "seguimiento-de-salud": () => import("../salud/seguimiento-de-salud/form").then((m) => m.form),
   "planificador-de-comidas-y-rutinas": () =>
     import("../salud/planificador-de-comidas-y-rutinas/form").then((m) => m.form),
+  "plan-de-negocio-12-meses": () =>
+    import("../emprendedores/plan-de-negocio-12-meses/form").then((m) => m.form),
+  "costos-de-producto": () =>
+    import("../emprendedores/costos-de-producto/form").then((m) => m.form),
+  "calendario-de-contenido": () =>
+    import("../emprendedores/calendario-de-contenido/form").then((m) => m.form),
+  "campanas-y-resultados": () =>
+    import("../emprendedores/campanas-y-resultados/form").then((m) => m.form),
+  "crm-simple": () => import("../emprendedores/crm-simple/form").then((m) => m.form),
+  "metas-de-ventas": () => import("../emprendedores/metas-de-ventas/form").then((m) => m.form),
+  "plan-de-lanzamiento": () =>
+    import("../emprendedores/plan-de-lanzamiento/form").then((m) => m.form),
 };

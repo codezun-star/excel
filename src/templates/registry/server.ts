@@ -134,6 +134,17 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
   "seguimiento-de-salud": () => import("../salud/seguimiento-de-salud").then((m) => m.default),
   "planificador-de-comidas-y-rutinas": () =>
     import("../salud/planificador-de-comidas-y-rutinas").then((m) => m.default),
+  "plan-de-negocio-12-meses": () =>
+    import("../emprendedores/plan-de-negocio-12-meses").then((m) => m.default),
+  "costos-de-producto": () => import("../emprendedores/costos-de-producto").then((m) => m.default),
+  "calendario-de-contenido": () =>
+    import("../emprendedores/calendario-de-contenido").then((m) => m.default),
+  "campanas-y-resultados": () =>
+    import("../emprendedores/campanas-y-resultados").then((m) => m.default),
+  "crm-simple": () => import("../emprendedores/crm-simple").then((m) => m.default),
+  "metas-de-ventas": () => import("../emprendedores/metas-de-ventas").then((m) => m.default),
+  "plan-de-lanzamiento": () =>
+    import("../emprendedores/plan-de-lanzamiento").then((m) => m.default),
 };
 
 export async function loadServerTemplate(slug: string): Promise<AnyTemplateDefinition | null> {

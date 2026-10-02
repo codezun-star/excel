@@ -1,6 +1,7 @@
 import type ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 
+import { HN } from "@/countries/hn";
 import type { EvaluatedWorkbook } from "@/test/formula-engine";
 import { buildExample, tableRow, valueRightOf } from "@/test/template-helpers";
 
@@ -813,5 +814,189 @@ describe("cálculos de plantillas (segunda ola)", () => {
       "Minutos planificados": 60,
       "Minutos cumplidos": 20,
     });
+  });
+
+  it("plan-de-negocio-12-meses: ventas, préstamo, flujo de caja e indicadores", async () => {
+    const { wb, ev } = await buildExample("plan-de-negocio-12-meses");
+    const products = [
+      [35, 10, 900, 0.03],
+      [30, 12, 1200, 0.02],
+      [45, 18, 400, 0.04],
+    ];
+    const r = 0.18 / 12;
+    const payment = pmt(100000, r, 24);
+    const dep = 160000 / 60;
+    let balance = 100000;
+    let cash = 75000;
+    let salesYear = 0;
+    let netYear = 0;
+    let minCash = Infinity;
+    let firstProfit = 0;
+    for (let m = 0; m < 12; m++) {
+      let sales = 0;
+      let cost = 0;
+      for (const [price, unitCost, units, growth] of products) {
+        const u = Math.round(units! * Math.pow(1 + growth!, m));
+        sales += u * price!;
+        cost += u * unitCost!;
+      }
+      const fixed = 51400 + (m >= 3 ? 9000 : 0);
+      const interest = Math.round(balance * r * 100) / 100;
+      const principal = payment - interest;
+      balance = Math.max(0, balance - principal);
+      const ebit = sales - cost - fixed - dep;
+      const net = ebit - interest;
+      if (!firstProfit && ebit > 0) firstProfit = m + 1;
+      cash += net + dep - principal;
+      minCash = Math.min(minCash, cash);
+      salesYear += sales;
+      netYear += net;
+    }
+    expect(valueRightOf(wb, ev, "Supuestos", "Efectivo al iniciar operaciones")).toBe(75000);
+    expect(valueRightOf(wb, ev, "Indicadores", "Ventas del año")).toBe(salesYear);
+    expect(valueRightOf(wb, ev, "Indicadores", "Utilidad neta del año")).toBeCloseTo(netYear, 2);
+    expect(valueRightOf(wb, ev, "Indicadores", "Efectivo al final del año")).toBeCloseTo(cash, 2);
+    expect(valueRightOf(wb, ev, "Indicadores", "Efectivo más bajo del año")).toBeCloseTo(
+      minCash,
+      2,
+    );
+    expect(valueRightOf(wb, ev, "Indicadores", "Saldo del préstamo al cierre")).toBeCloseTo(
+      balance,
+      2,
+    );
+    expect(valueRightOf(wb, ev, "Indicadores", "Primer mes con utilidad de operación")).toBe(
+      firstProfit ? `Mes ${firstProfit}` : "No se alcanza en el año",
+    );
+  });
+
+  it("costos-de-producto: costo unitario, precio sugerido con ISV y margen real", async () => {
+    const { wb, ev } = await buildExample("costos-de-producto");
+    const isv = HN.taxes.salesTax.rates.find((x) => x.id === "standard")!.rate;
+    const pan = tableRow(wb, ev, "Productos", "Producto", "Pan de coco (bolsa de 6)");
+    expect(pan).toMatchObject({ "Materiales del lote": 419.5, "Mano de obra del lote": 180 });
+    expect(pan["Costo por unidad"]).toBeCloseTo(37.975, 6);
+    expect(pan["Precio sugerido"]).toBeCloseTo(37.975 / 0.6, 6);
+    expect(pan["Margen real"]).toBeCloseTo((60 - 37.975) / 60, 6);
+    const pastel = tableRow(wb, ev, "Productos", "Producto", "Pastel tres leches (porción)");
+    expect(pastel["Costo por unidad"]).toBeCloseTo(38.125, 6);
+    expect(pastel["Sugerido con ISV"]).toBeCloseTo((38.125 / 0.6) * (1 + isv), 6);
+    const net = 70 / (1 + isv);
+    expect(pastel["Margen real"]).toBeCloseTo((net - 38.125) / net, 6);
+    expect(valueRightOf(wb, ev, "Gastos indirectos", "Gasto indirecto por unidad")).toBe(6);
+  });
+
+  it("calendario-de-contenido: día de la semana, tasa de interacción y resultados", async () => {
+    const { wb, ev } = await buildExample("calendario-de-contenido");
+    const rows = columnBelow(wb, ev, "Publicaciones", "Tasa de interacción", 2);
+    expect(rows[0]).toBeCloseTo(240 / 3200, 8);
+    const day = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"][
+      new Date(`${isoFromToday(-6)}T12:00:00Z`).getUTCDay()
+    ];
+    expect(columnBelow(wb, ev, "Publicaciones", "Día", 1)[0]).toBe(day);
+    const fb = tableRow(wb, ev, "Resultados", "Red", "Facebook");
+    expect(fb).toMatchObject({ Publicadas: 1, Alcance: 3200, Interacciones: 240, Mensajes: 18 });
+    expect(fb["Tasa de interacción"]).toBeCloseTo(0.075, 8);
+    expect(tableRow(wb, ev, "Resultados", "Tema", "Promoción")).toMatchObject({
+      Planificadas: 2,
+      Publicadas: 1,
+    });
+  });
+
+  it("campanas-y-resultados: métricas por campaña, ROAS y ganancia", async () => {
+    const { wb, ev } = await buildExample("campanas-y-resultados");
+    const promo = tableRow(wb, ev, "Campañas", "Campaña", "Promo Día del Padre");
+    expect(promo).toMatchObject({
+      Invertido: 3000,
+      "% del presupuesto": 0.75,
+      Clics: 1160,
+      "Costo por venta": 120,
+      Ingresos: 30000,
+      "ROAS (ingresos ÷ inversión)": 10,
+      "Ganancia después de publicidad": 9000,
+    });
+    expect(promo.CTR).toBeCloseTo(1160 / 81000, 8);
+    expect(promo["Costo por clic"]).toBeCloseTo(3000 / 1160, 8);
+    expect(tableRow(wb, ev, "Campañas", "Campaña", "Volanteo colonia")).toMatchObject({
+      CTR: "",
+      "Costo por clic": "",
+      "Ganancia después de publicidad": 600,
+    });
+    expect(valueRightOf(wb, ev, "Resumen", "ROAS total")).toBeCloseTo(35400 / 4400, 8);
+    expect(valueRightOf(wb, ev, "Resumen", "Ganancia después de publicidad")).toBe(9760);
+    expect(tableRow(wb, ev, "Resumen", "Plataforma", "Facebook e Instagram")).toMatchObject({
+      Invertido: 3000,
+      ROAS: 10,
+    });
+  });
+
+  it("crm-simple: probabilidad, último contacto, alertas y embudo", async () => {
+    const { wb, ev } = await buildExample("crm-simple");
+    expect(tableRow(wb, ev, "Clientes", "Nombre", "Ana Gabriela Matute")).toMatchObject({
+      Probabilidad: 0.4,
+      "Valor ponderado": 9600,
+      "Último contacto": serial(isoFromToday(-12)),
+      Contactos: 2,
+      Alerta: "Acción atrasada",
+    });
+    expect(tableRow(wb, ev, "Clientes", "Nombre", "Transportes Rápidos S. de R.L.")).toMatchObject({
+      "Último contacto": serial(isoFromToday(-3)),
+      Alerta: "",
+    });
+    expect(tableRow(wb, ev, "Clientes", "Nombre", "María Fernanda Cálix")).toMatchObject({
+      "Último contacto": "",
+      Alerta: "",
+    });
+    expect(tableRow(wb, ev, "Embudo", "Etapa de venta", "Cotizado")).toMatchObject({
+      Clientes: 1,
+      Valor: 24000,
+      "Valor ponderado": 9600,
+    });
+    expect(tableRow(wb, ev, "Embudo", "Origen", "Facebook")).toMatchObject({
+      Clientes: 1,
+      Ganados: 1,
+      Conversión: 1,
+      Vendido: 12000,
+    });
+    expect(valueRightOf(wb, ev, "Embudo", "Valor ponderado en proceso")).toBe(64400);
+    expect(valueRightOf(wb, ev, "Embudo", "Clientes con alerta")).toBe(1);
+  });
+
+  it("metas-de-ventas: ventas reales y cumplimiento por mes", async () => {
+    const { wb, ev } = await buildExample("metas-de-ventas");
+    expect(tableRow(wb, ev, "Cumplimiento", "Ventas reales", "María")).toMatchObject({
+      Ene: 55000,
+      Feb: 42000,
+      "Total del año": 97000,
+    });
+    const pct = tableRow(wb, ev, "Cumplimiento", "% de la meta", "María");
+    expect(pct).toMatchObject({ Ene: 1.1, Feb: 0.84 });
+    expect(pct["Año"]).toBeCloseTo(97000 / 600000, 8);
+    expect(tableRow(wb, ev, "Cumplimiento", "% de la meta", "Carlos").Ene).toBe(0.7);
+    expect(tableRow(wb, ev, "Metas", "Vendedor", "Tienda en línea")["Meta del año"]).toBe(600000);
+    expect(tableRow(wb, ev, "Este mes", "Vendedor", "María")["Meta del mes"]).toBe(50000);
+  });
+
+  it("plan-de-lanzamiento: fechas desde el lanzamiento, avance y presupuesto", async () => {
+    const { wb, ev } = await buildExample("plan-de-lanzamiento");
+    expect(valueRightOf(wb, ev, "Plan", "Días para el lanzamiento")).toBe(45);
+    expect(
+      tableRow(wb, ev, "Plan", "Tarea", "Definir el producto, el cliente ideal y el precio"),
+    ).toMatchObject({
+      Inicio: serial(isoFromToday(0)),
+      Fin: serial(isoFromToday(4)),
+      Estado: "Hecho",
+      Alerta: "",
+    });
+    expect(tableRow(wb, ev, "Plan", "Tarea", "Pedir reseñas y testimonios").Inicio).toBe(
+      serial(isoFromToday(52)),
+    );
+    expect(tableRow(wb, ev, "Resumen", "Fase", "Preparación")).toMatchObject({
+      Tareas: 6,
+      Hechas: 5,
+      Presupuesto: 9500,
+      "Gasto real": 5850,
+    });
+    expect(valueRightOf(wb, ev, "Resumen", "Avance total")).toBeCloseTo(5 / 21, 8);
+    expect(valueRightOf(wb, ev, "Resumen", "Presupuesto disponible")).toBe(34000 - 5850);
   });
 });

@@ -106,4 +106,14 @@ export const CLIENT_BUILDERS: Record<string, () => Promise<AnyTemplateBuild>> = 
   "seguimiento-de-salud": () => import("../salud/seguimiento-de-salud/build").then((m) => m.build),
   "planificador-de-comidas-y-rutinas": () =>
     import("../salud/planificador-de-comidas-y-rutinas/build").then((m) => m.build),
+  "costos-de-producto": () =>
+    import("../emprendedores/costos-de-producto/build").then((m) => m.build),
+  "calendario-de-contenido": () =>
+    import("../emprendedores/calendario-de-contenido/build").then((m) => m.build),
+  "campanas-y-resultados": () =>
+    import("../emprendedores/campanas-y-resultados/build").then((m) => m.build),
+  "crm-simple": () => import("../emprendedores/crm-simple/build").then((m) => m.build),
+  "metas-de-ventas": () => import("../emprendedores/metas-de-ventas/build").then((m) => m.build),
+  "plan-de-lanzamiento": () =>
+    import("../emprendedores/plan-de-lanzamiento/build").then((m) => m.build),
 };

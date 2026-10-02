@@ -88,6 +88,13 @@ import { meta as historialDeConsultas } from "../salud/historial-de-consultas/me
 import { meta as medicamentosYVencimientos } from "../salud/medicamentos-y-vencimientos/meta";
 import { meta as seguimientoDeSalud } from "../salud/seguimiento-de-salud/meta";
 import { meta as planificadorDeComidasYRutinas } from "../salud/planificador-de-comidas-y-rutinas/meta";
+import { meta as planDeNegocio12Meses } from "../emprendedores/plan-de-negocio-12-meses/meta";
+import { meta as costosDeProducto } from "../emprendedores/costos-de-producto/meta";
+import { meta as calendarioDeContenido } from "../emprendedores/calendario-de-contenido/meta";
+import { meta as campanasYResultados } from "../emprendedores/campanas-y-resultados/meta";
+import { meta as crmSimple } from "../emprendedores/crm-simple/meta";
+import { meta as metasDeVentas } from "../emprendedores/metas-de-ventas/meta";
+import { meta as planDeLanzamiento } from "../emprendedores/plan-de-lanzamiento/meta";
 
 /**
  * Metadatos de las plantillas implementadas (status "ready").
@@ -186,4 +193,11 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   medicamentosYVencimientos,
   seguimientoDeSalud,
   planificadorDeComidasYRutinas,
+  planDeNegocio12Meses,
+  costosDeProducto,
+  calendarioDeContenido,
+  campanasYResultados,
+  crmSimple,
+  metasDeVentas,
+  planDeLanzamiento,
 ];

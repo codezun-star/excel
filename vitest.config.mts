@@ -12,5 +12,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
+    // Generar y evaluar con el motor de fórmulas los libros más grandes puede pasar de 5 s con la suite completa.
+    testTimeout: 30_000,
   },
 });

@@ -60,50 +60,6 @@ export const COMING_SOON: TemplateMeta[] = [
   // ---------------------------------------------------------------- Bienes raíces
 
   // ---------------------------------------------------------------- Emprendedores
-  comingSoon("emprendedores", {
-    slug: "plan-de-negocio-12-meses",
-    title: "Plan de negocio a 12 meses",
-    shortDescription: "Proyección de ventas, costos y utilidades para tu plan de negocio.",
-    tier: "pro",
-  }),
-  comingSoon("emprendedores", {
-    slug: "costos-de-producto",
-    title: "Costos de producto",
-    shortDescription: "Costo unitario con materiales, mano de obra y gastos, y precio sugerido.",
-    tier: "free",
-    businessTypes: ["comercio", "cafeteria-panaderia", "freelancer"],
-  }),
-  comingSoon("emprendedores", {
-    slug: "calendario-de-contenido",
-    title: "Calendario de contenido",
-    shortDescription: "Publicaciones por red social, fecha, formato y estado.",
-    tier: "free",
-  }),
-  comingSoon("emprendedores", {
-    slug: "campanas-y-resultados",
-    title: "Campañas y resultados",
-    shortDescription: "Inversión en anuncios, alcance, clientes y costo por resultado.",
-    tier: "free",
-  }),
-  comingSoon("emprendedores", {
-    slug: "crm-simple",
-    title: "CRM simple",
-    shortDescription: "Clientes potenciales, seguimiento, etapa de venta y próximos pasos.",
-    tier: "free",
-    businessTypes: ["servicios", "freelancer", "inmobiliaria"],
-  }),
-  comingSoon("emprendedores", {
-    slug: "metas-de-ventas",
-    title: "Metas de ventas",
-    shortDescription: "Metas mensuales contra ventas reales con porcentaje de cumplimiento.",
-    tier: "free",
-  }),
-  comingSoon("emprendedores", {
-    slug: "plan-de-lanzamiento",
-    title: "Plan de lanzamiento",
-    shortDescription: "Tareas, responsables y fechas para lanzar un producto.",
-    tier: "free",
-  }),
 
   // ---------------------------------------------------------------- Salud
 ];
