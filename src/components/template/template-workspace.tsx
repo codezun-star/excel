@@ -8,6 +8,9 @@ import type { FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 
 import { saveConfiguration } from "@/app/actions/configs";
+import { Paywall, type PaywallReason } from "@/components/billing/paywall";
+import { UsageBanner } from "@/components/billing/usage-banner";
+import { useAccess } from "@/components/billing/use-access";
 import { DynamicForm } from "@/components/config-form/dynamic-form";
 import { useSessionUser } from "@/components/layout/user-menu";
 import { WorkbookPreview } from "@/components/preview/workbook-preview";
@@ -29,6 +32,7 @@ import { downloadBlob, downloadWorkbook } from "@/lib/excel/download";
 import type { PreviewData } from "@/lib/excel/preview";
 import { workbookToPreview } from "@/lib/excel/preview";
 import { workbookFileName } from "@/lib/excel/filename";
+import type { BuildOptions } from "@/lib/excel/workbook";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import { loadClientBuilder, loadTemplateForm } from "@/lib/templates-client";
 import { resolveDefaultConfig, type AnyTemplateForm, type TemplateTier } from "@/templates/types";
@@ -42,6 +46,15 @@ export interface TemplateWorkspaceProps {
 
 type Status = "loading" | "ready" | "building" | "error";
 
+type PreviewWithAccess = PreviewData & { access?: string };
+
+/** Quita los campos Pro (p. ej. logo) cuando el plan no los incluye. */
+function withoutProOnly(form: AnyTemplateForm, config: unknown, defaults: FieldValues): unknown {
+  const out = { ...(config as Record<string, unknown>) };
+  for (const f of form.formFields) if (f.proOnly) out[f.name] = defaults[f.name];
+  return out;
+}
+
 /**
  * Espacio de trabajo de una plantilla: formulario dinámico, vista previa y
  * descarga. Las plantillas gratis se generan en el navegador; las Pro, en el
@@ -52,6 +65,13 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
   const searchParams = useSearchParams();
   const configId = searchParams.get("config");
   const { user } = useSessionUser();
+  const { access, refresh: refreshAccess } = useAccess(slug);
+  const [paywall, setPaywall] = useState<{ reason: PaywallReason; limit?: number | null } | null>(
+    null,
+  );
+  const proLocked = !(access?.limits.customLogo ?? false);
+  const watermark = access?.limits.watermark ?? true;
+  const lockedPro = tier === "pro" && access?.access === "none";
 
   const [form, setForm] = useState<AnyTemplateForm | null>(null);
   const [initial, setInitial] = useState<FieldValues | null>(null);
@@ -64,6 +84,12 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
   const valuesRef = useRef<FieldValues>({});
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const runId = useRef(0);
+
+  // Con sesión pero sin plan que guarde, se muestra el muro de pago en lugar del diálogo.
+  const openSave = () => {
+    if (user && access && !access.limits.saveConfigs) setPaywall({ reason: "save_requires_plan" });
+    else setSaveOpen(true);
+  };
 
   // Carga del formulario y, si se pidió, de una configuración guardada.
   useEffect(() => {
@@ -108,6 +134,15 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
     [form],
   );
 
+  /** Configuración que se envía a construir según el plan (sin campos Pro si no aplica). */
+  const forPlan = useCallback(
+    (config: unknown) =>
+      form && proLocked
+        ? withoutProOnly(form, config, resolveDefaultConfig(form, ctx) as FieldValues)
+        : config,
+    [form, proLocked, ctx],
+  );
+
   const buildPreview = useCallback(
     async (values: FieldValues) => {
       const config = parse(values);
@@ -120,7 +155,7 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
         if (tier === "free") {
           const build = await loadClientBuilder(slug);
           if (!build) throw new Error("Build no disponible");
-          const wb = await build(config, ctx, { watermark: true });
+          const wb = await build(forPlan(config), ctx, { watermark });
           data = workbookToPreview(wb);
         } else {
           const res = await fetch(`/api/preview/${slug}`, {
@@ -129,7 +164,7 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
             body: JSON.stringify({ config: values, country }),
           });
           if (!res.ok) throw new Error(await res.text());
-          data = (await res.json()) as PreviewData;
+          data = (await res.json()) as PreviewWithAccess;
         }
         if (id === runId.current) setPreview(data);
       } catch (err) {
@@ -139,7 +174,7 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
         if (id === runId.current) setStatus("ready");
       }
     },
-    [parse, tier, slug, ctx, country],
+    [parse, forPlan, watermark, tier, slug, ctx, country],
   );
 
   const onValuesChange = useCallback(
@@ -158,15 +193,21 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
     [],
   );
 
-  const logDownload = useCallback(async () => {
-    const supabase = getBrowserSupabase();
-    if (!supabase) return;
-    await supabase
-      .from("downloads")
-      .insert({ template_slug: slug, country, user_id: user?.id ?? null });
-  }, [slug, country, user]);
+  const deny = (body: { code?: string; limit?: number | null }) => {
+    const reason: PaywallReason =
+      body.code === "pro_required"
+        ? "pro_required"
+        : body.code === "login_required"
+          ? "login_required"
+          : "limit_reached";
+    setPaywall({ reason, limit: body.limit });
+  };
 
   const download = async () => {
+    if (lockedPro) {
+      setPaywall({ reason: "pro_required" });
+      return;
+    }
     const values = valuesRef.current;
     const config = parse(values);
     if (!config) {
@@ -177,9 +218,27 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
     try {
       const filename = workbookFileName(slug, ctx);
       if (tier === "free") {
+        // 1) El servidor autoriza y cuenta la descarga; 2) se genera en el navegador.
+        const auth = await fetch("/api/downloads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug, country }),
+        });
+        const data = (await auth.json().catch(() => ({}))) as {
+          buildOptions?: BuildOptions;
+          code?: string;
+          limit?: number | null;
+          error?: string;
+        };
+        if (!auth.ok) {
+          if (auth.status === 401 || auth.status === 403 || data.code === "limit_reached")
+            deny(data);
+          else toast.error(data.error ?? "No se pudo descargar");
+          return;
+        }
         const build = await loadClientBuilder(slug);
         if (!build) throw new Error("Build no disponible");
-        const wb = await build(config, ctx, { watermark: true });
+        const wb = await build(forPlan(config), ctx, data.buildOptions ?? { watermark: true });
         await downloadWorkbook(wb, filename);
       } else {
         const res = await fetch(`/api/generate/${slug}`, {
@@ -187,11 +246,20 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ config: values, country }),
         });
-        if (!res.ok) throw new Error(await res.text());
+        if (!res.ok) {
+          const data = (await res.json().catch(() => ({}))) as {
+            code?: string;
+            limit?: number | null;
+            error?: string;
+          };
+          if (data.code && data.code !== "invalid") deny(data);
+          else toast.error(data.error ?? "No se pudo generar el archivo");
+          return;
+        }
         downloadBlob(await res.blob(), filename);
       }
       toast.success("¡Listo! Tu archivo se descargó.");
-      void logDownload().catch(() => undefined);
+      void refreshAccess();
     } catch (err) {
       console.error(err);
       toast.error("No se pudo generar el archivo. Intenta de nuevo.");
@@ -252,6 +320,7 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
           ctx={ctx}
           initialValues={initial}
           onValuesChange={onValuesChange}
+          proLocked={proLocked}
         />
       </div>
 
@@ -270,6 +339,16 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
             </span>
           </div>
           {preview ? <WorkbookPreview data={preview} /> : <Skeleton className="h-80" />}
+          {lockedPro && (
+            <div className="mt-3 rounded-lg border border-highlight bg-highlight/10 p-3 text-sm">
+              <p className="font-semibold">Vista previa limitada</p>
+              <p className="mt-0.5 text-muted-foreground">
+                Las fórmulas y los valores completos se ven en el archivo descargado con Pro o con
+                la compra única de esta plantilla.
+              </p>
+            </div>
+          )}
+          <UsageBanner access={access} className="mt-3" />
           <p className="mt-3 text-xs text-muted-foreground">{es.workspace.formulaHint}</p>
           <div className="mt-4 hidden gap-2 sm:flex">
             <Button
@@ -279,14 +358,13 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
               disabled={downloading || invalid}
             >
               {downloading ? <Loader2Icon className="animate-spin" /> : <DownloadIcon />}
-              {downloading ? es.workspace.downloading : es.workspace.download}
+              {downloading
+                ? es.workspace.downloading
+                : lockedPro
+                  ? "Desbloquear y descargar"
+                  : es.workspace.download}
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => setSaveOpen(true)}
-              disabled={invalid}
-            >
+            <Button size="lg" variant="outline" onClick={openSave} disabled={invalid}>
               <SaveIcon />
               <span className="sr-only lg:not-sr-only">{es.workspace.save}</span>
             </Button>
@@ -304,7 +382,7 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
           <Button
             size="lg"
             variant="outline"
-            onClick={() => setSaveOpen(true)}
+            onClick={openSave}
             aria-label={es.workspace.save}
             disabled={invalid}
           >
@@ -324,9 +402,22 @@ export function TemplateWorkspace({ slug, title, tier, country }: TemplateWorksp
           if (res.ok) {
             toast.success("Configuración guardada en tu cuenta");
             setSaveOpen(false);
+          } else if (res.code === "plan_required") {
+            setSaveOpen(false);
+            setPaywall({ reason: "save_requires_plan" });
           } else toast.error(res.error);
         }}
         next={`${typeof window === "undefined" ? "" : window.location.pathname}`}
+      />
+      <Paywall
+        open={paywall !== null}
+        onOpenChange={(open) => !open && setPaywall(null)}
+        reason={paywall?.reason ?? "pro_required"}
+        limit={paywall?.limit}
+        loggedIn={Boolean(user)}
+        templateSlug={slug}
+        templateTitle={title}
+        oneTimePriceUsd={tier === "pro" ? access?.oneTimePriceUsd : undefined}
       />
     </div>
   );
