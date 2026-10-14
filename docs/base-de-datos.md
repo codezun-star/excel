@@ -77,19 +77,19 @@ Historial de descargas. `user_id` es nulo para descargas anónimas.
 `client_profiles` (alta y edición) y `manual_payments` solo las escribe el
 servidor (rol de servicio) o un administrador. Los usuarios solo **leen** sus filas.
 
-| Tabla                | Para qué sirve                                                                                            | Quién escribe             |
-| -------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `plans`              | Precios, límites (`limits`, mismas claves que `PlanLimits` en `src/config/plans.ts`) y beneficios.        | Admin                     |
-| `subscriptions`      | Suscripciones por proveedor (`paddle`, `manual` para transferencias, `coupon`, `admin`), estado y fin del período.                  | Servidor / admin          |
-| `purchases`          | Compras únicas de plantillas Pro.                                                                         | Servidor / admin          |
-| `entitlements`       | **La fuente de verdad del acceso**: `kind` (`plan` o `template`), `ref`, `valid_until`, `source` (único). | Servidor / admin          |
-| `usage_counters`     | Descargas por mes de cada cuenta (`user_id`) o visitante anónimo (`anon_id` de cookie firmada).           | Función `increment_…`     |
-| `client_profiles`    | Perfiles de cliente o empresa del plan Negocio (nombre, RTN, logo como data URL, marca).                  | Servidor (el dueño borra) |
-| `coupons`            | Cupones: `percent_off`, `max_redemptions`, `expires_at`, `applies_to`, `duration_months`.                 | Admin                     |
-| `coupon_redemptions` | Un canje por usuario y cupón.                                                                             | Función `redeem_coupon`   |
-| `payment_events`     | Cada webhook recibido, con `(provider, event_id)` único para ignorar duplicados.                          | Servidor                  |
-| `manual_payments`    | Transferencias con referencia única, comprobante y estado `pending` / `approved` / `rejected`.            | Servidor / admin          |
-| `events`             | Analítica propia: `paywall_view`, `checkout_start`, `payment_completed`, `download`, …                    | Servidor                  |
+| Tabla                | Para qué sirve                                                                                                     | Quién escribe             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------- |
+| `plans`              | Precios, límites (`limits`, mismas claves que `PlanLimits` en `src/config/plans.ts`) y beneficios.                 | Admin                     |
+| `subscriptions`      | Suscripciones por proveedor (`paddle`, `manual` para transferencias, `coupon`, `admin`), estado y fin del período. | Servidor / admin          |
+| `purchases`          | Compras únicas de plantillas Pro.                                                                                  | Servidor / admin          |
+| `entitlements`       | **La fuente de verdad del acceso**: `kind` (`plan` o `template`), `ref`, `valid_until`, `source` (único).          | Servidor / admin          |
+| `usage_counters`     | Descargas por mes de cada cuenta (`user_id`) o visitante anónimo (`anon_id` de cookie firmada).                    | Función `increment_…`     |
+| `client_profiles`    | Perfiles de cliente o empresa del plan Negocio (nombre, RTN, logo como data URL, marca).                           | Servidor (el dueño borra) |
+| `coupons`            | Cupones: `percent_off`, `max_redemptions`, `expires_at`, `applies_to`, `duration_months`.                          | Admin                     |
+| `coupon_redemptions` | Un canje por usuario y cupón.                                                                                      | Función `redeem_coupon`   |
+| `payment_events`     | Cada webhook recibido, con `(provider, event_id)` único para ignorar duplicados.                                   | Servidor                  |
+| `manual_payments`    | Transferencias con referencia única, comprobante y estado `pending` / `approved` / `rejected`.                     | Servidor / admin          |
+| `events`             | Analítica propia: `paywall_view`, `checkout_start`, `payment_completed`, `download`, …                             | Servidor                  |
 
 Columnas nuevas en tablas existentes:
 

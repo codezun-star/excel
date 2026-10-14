@@ -35,6 +35,7 @@ export function CatalogBrowser({ items }: { items: TemplateMeta[] }) {
   const business = (params.get("negocio") as BusinessTypeId | null) ?? null;
   const tier = (params.get("tipo") as TemplateTier | null) ?? null;
   const onlyReady = params.get("disponibles") === "1";
+  const hasComingSoon = items.some((t) => t.status === "coming-soon");
 
   const update = (patch: Record<string, string | null>) => {
     const next = new URLSearchParams(params.toString());
@@ -139,13 +140,15 @@ export function CatalogBrowser({ items }: { items: TemplateMeta[] }) {
             </SelectContent>
           </Select>
         </div>
-        <label className="flex h-10 items-center gap-2 text-sm font-medium">
-          <Switch
-            checked={onlyReady}
-            onCheckedChange={(v) => update({ disponibles: v ? "1" : null })}
-          />
-          Solo disponibles
-        </label>
+        {hasComingSoon && (
+          <label className="flex h-10 items-center gap-2 text-sm font-medium">
+            <Switch
+              checked={onlyReady}
+              onCheckedChange={(v) => update({ disponibles: v ? "1" : null })}
+            />
+            Solo disponibles
+          </label>
+        )}
       </div>
 
       <div className="mt-6 flex items-center justify-between gap-3">

@@ -35,8 +35,11 @@ export default function CatalogPage() {
       <header className="max-w-2xl">
         <h1 className="text-3xl font-extrabold sm:text-4xl">Catálogo de plantillas</h1>
         <p className="mt-2 text-lg text-muted-foreground">
-          {ready.length} plantillas listas para configurar y descargar, y{" "}
-          {CATALOG.length - ready.length} más en camino.
+          {ready.length} plantillas listas para configurar y descargar
+          {CATALOG.length > ready.length
+            ? `, y ${CATALOG.length - ready.length} más en camino`
+            : ""}
+          .
         </p>
       </header>
       <div className="mt-8">

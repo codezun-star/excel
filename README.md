@@ -4,8 +4,8 @@ Generador de plantillas de Excel configurables. La persona elige una plantilla, 
 
 Primer mercado: **Honduras** (lempira, ISV, IHSS, RAP, ISR). La arquitectura permite agregar más países de Latinoamérica sin rehacer las plantillas.
 
-- **45 plantillas implementadas** (factura con ISV, planilla con IHSS/RAP/ISR, décimos, prestaciones, declaración del ISV, ISR anual, libro de ventas y compras, inventario, kardex, caja diaria, fiados, préstamos, remesas, patronato, caja rural, notas escolares y más). Cada una tiene pruebas automáticas que **evalúan sus fórmulas** con un motor compatible con Excel.
-- **99 plantillas en el catálogo**: el resto aparece como "Próximamente".
+- **99 plantillas implementadas: el catálogo completo** (factura con ISV, planilla con IHSS/RAP/ISR, décimos, prestaciones, declaración del ISV, ISR anual, control de retenciones, impuesto municipal, libro de ventas y compras, inventario, kardex, consignación, costos de importación, caja diaria, fiados, préstamos, remesas, patronato, caja rural, notas escolares, plantillas por tipo de negocio y más). Cada una tiene pruebas automáticas que **evalúan sus fórmulas** con un motor compatible con Excel.
+- Ya no quedan plantillas "Próximamente"; el mecanismo sigue disponible para anunciar nuevas (`src/templates/coming-soon.ts`).
 - **Monetización freemium** (Fase 2): plan Gratis con límite mensual, Pro, Negocio/Contador y compra única. Pagos con **tarjeta (Paddle)** y **transferencia o depósito a BAC, Atlántida o Promerica** con revisión en `/admin/pagos`.
 - **Blog con 12 guías** y **7 calculadoras gratis** para Honduras (décimo cuarto, aguinaldo, prestaciones, ISR, ISV, horas extra y préstamos) que llevan a las plantillas. Las tasas de las guías y calculadoras salen del mismo módulo de reglas que las plantillas.
 
@@ -154,7 +154,7 @@ Cada plantilla vive en `src/templates/<categoria>/<slug>/` y se divide en cuatro
 
 ### Cómo agregar un país nuevo
 
-1. Copia `src/countries/hn.ts` como `src/countries/<codigo>.ts` y completa el `CountryContext`: moneda y denominaciones, identificador tributario, impuesto sobre ventas (`taxes.salesTax`, con su nombre: IVA, ITBMS…), ISR, seguridad social, aportes patronales, reglas laborales, salario mínimo y datos de facturación.
+1. Copia `src/countries/hn.ts` como `src/countries/<codigo>.ts` y completa el `CountryContext`: moneda y denominaciones, identificador tributario, impuesto sobre ventas (`taxes.salesTax`, con su nombre: IVA, ITBMS…), ISR, retenciones en la fuente (`taxes.withholding`), impuesto municipal (`taxes.municipal`), aranceles de importación (`taxes.customs`), seguridad social, aportes patronales, reglas laborales, salario mínimo y datos de facturación.
 2. Marca cada valor legal con `// TODO: VERIFICAR VALOR VIGENTE` hasta confirmarlo con fuentes oficiales y deja `reviewStatus: "pending"`. Así la interfaz muestra un aviso.
 3. Regístralo en `src/countries/index.ts` (en `CONTEXTS` y con `status: "active"` en `COUNTRIES`).
 4. Las plantillas con `countries: "ALL"` funcionan de inmediato con la moneda y las tasas del país. Para las que hoy son solo `["HN"]`, revisa que la lógica aplique y agrega el código del país.
@@ -265,7 +265,7 @@ El plan se deduce del `price_id` recibido (no de datos que pueda alterar el clie
 
 ## Valores fiscales y laborales
 
-Todos los valores legales de Honduras están en `src/countries/hn.ts`, marcados con `// TODO: VERIFICAR VALOR VIGENTE`. Se recopilaron de fuentes secundarias (prensa y guías especializadas) en octubre de 2026 porque los sitios oficiales no fueron accesibles desde el entorno de desarrollo. **Deben confirmarse con La Gaceta, el SAR, la STSS, el IHSS y el RAP antes de publicar.** Cuando se confirmen:
+Todos los valores legales de Honduras están en `src/countries/hn.ts` (ISV, ISR, IHSS, RAP, retenciones, tabla por millar del impuesto municipal, tasas comunes del DAI y reglas laborales), marcados con `// TODO: VERIFICAR VALOR VIGENTE`. Se recopilaron de fuentes secundarias (prensa y guías especializadas) en octubre de 2026 porque los sitios oficiales no fueron accesibles desde el entorno de desarrollo. **Deben confirmarse con La Gaceta, el SAR, la STSS, el IHSS y el RAP antes de publicar.** Cuando se confirmen:
 
 1. Actualiza los valores, `lastReviewed` y `rulesVersion`.
 2. Cambia `reviewStatus` a `"verified"` para quitar el aviso de "pendiente de verificación".
