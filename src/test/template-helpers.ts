@@ -60,7 +60,7 @@ export function tableRow(
   ev: EvaluatedWorkbook,
   sheet: string,
   headerLabel: string,
-  rowKey: string,
+  rowKey: string | number,
 ): Record<string, unknown> {
   const ws = wb.getWorksheet(sheet);
   if (!ws) throw new Error(`Hoja inexistente: ${sheet}`);

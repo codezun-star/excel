@@ -31,6 +31,8 @@ import { meta as libroDiarioMayor } from "../impuestos/libro-diario-mayor/meta";
 import { meta as activosFijosDepreciacion } from "../impuestos/activos-fijos-depreciacion/meta";
 import { meta as estadoDeResultadosBalance } from "../impuestos/estado-de-resultados-balance/meta";
 import { meta as presupuestoAnual } from "../impuestos/presupuesto-anual/meta";
+import { meta as controlDeRetenciones } from "../impuestos/control-de-retenciones/meta";
+import { meta as impuestoMunicipal } from "../impuestos/impuesto-municipal/meta";
 import { meta as simuladorDePrestamos } from "../finanzas-personales/simulador-de-prestamos/meta";
 import { meta as prestamoDeVivienda } from "../finanzas-personales/prestamo-de-vivienda/meta";
 import { meta as inventarioStockMinimo } from "../inventario/inventario-stock-minimo/meta";
@@ -51,6 +53,8 @@ import { meta as evaluacionDeDesempeno } from "../planilla/evaluacion-de-desempe
 import { meta as inventarioPorLoteVencimiento } from "../inventario/inventario-por-lote-vencimiento/meta";
 import { meta as pedidosYEntregas } from "../inventario/pedidos-y-entregas/meta";
 import { meta as ventasPorWhatsapp } from "../inventario/ventas-por-whatsapp/meta";
+import { meta as mercaderiaEnConsignacion } from "../inventario/mercaderia-en-consignacion/meta";
+import { meta as costosDeImportacionAduana } from "../inventario/costos-de-importacion-aduana/meta";
 import { meta as pulperia } from "../negocios/pulperia/meta";
 import { meta as tallerMecanico } from "../negocios/taller-mecanico/meta";
 import { meta as barberiaSalon } from "../negocios/barberia-salon/meta";
@@ -136,6 +140,8 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   activosFijosDepreciacion,
   estadoDeResultadosBalance,
   presupuestoAnual,
+  controlDeRetenciones,
+  impuestoMunicipal,
   simuladorDePrestamos,
   prestamoDeVivienda,
   inventarioStockMinimo,
@@ -156,6 +162,8 @@ export const READY_METAS: (TemplateMeta & { status: "ready" })[] = [
   inventarioPorLoteVencimiento,
   pedidosYEntregas,
   ventasPorWhatsapp,
+  mercaderiaEnConsignacion,
+  costosDeImportacionAduana,
   pulperia,
   tallerMecanico,
   barberiaSalon,

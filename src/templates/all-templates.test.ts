@@ -24,6 +24,15 @@ function legalNumbers(ctx: CountryContext): number[] {
     if (b.to) values.add(b.to);
   });
   ctx.taxes.incomeTax.standardDeductions.forEach((d) => values.add(d.amount));
+  ctx.taxes.withholding.rules.forEach((w) => values.add(w.rate));
+  ctx.taxes.municipal.brackets.forEach((b) => {
+    values.add(b.perThousand);
+    values.add(b.from);
+    if (b.to) values.add(b.to);
+  });
+  if (ctx.taxes.municipal.regulatedPricePerThousand)
+    values.add(ctx.taxes.municipal.regulatedPricePerThousand);
+  ctx.taxes.customs.dutyRates.forEach((r) => values.add(r));
   ctx.labor.overtime.forEach((o) => values.add(o.surcharge));
   ctx.labor.minimumWage.table.forEach((row) =>
     row.monthly.forEach((m) => {

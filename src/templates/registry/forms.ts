@@ -52,6 +52,9 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
   "estado-de-resultados-balance": () =>
     import("../impuestos/estado-de-resultados-balance/form").then((m) => m.form),
   "presupuesto-anual": () => import("../impuestos/presupuesto-anual/form").then((m) => m.form),
+  "control-de-retenciones": () =>
+    import("../impuestos/control-de-retenciones/form").then((m) => m.form),
+  "impuesto-municipal": () => import("../impuestos/impuesto-municipal/form").then((m) => m.form),
   "simulador-de-prestamos": () =>
     import("../finanzas-personales/simulador-de-prestamos/form").then((m) => m.form),
   "prestamo-de-vivienda": () =>
@@ -85,6 +88,10 @@ export const FORM_LOADERS: Record<string, () => Promise<AnyTemplateForm>> = {
     import("../inventario/inventario-por-lote-vencimiento/form").then((m) => m.form),
   "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas/form").then((m) => m.form),
   "ventas-por-whatsapp": () => import("../inventario/ventas-por-whatsapp/form").then((m) => m.form),
+  "mercaderia-en-consignacion": () =>
+    import("../inventario/mercaderia-en-consignacion/form").then((m) => m.form),
+  "costos-de-importacion-aduana": () =>
+    import("../inventario/costos-de-importacion-aduana/form").then((m) => m.form),
   pulperia: () => import("../negocios/pulperia/form").then((m) => m.form),
   "taller-mecanico": () => import("../negocios/taller-mecanico/form").then((m) => m.form),
   "barberia-salon": () => import("../negocios/barberia-salon/form").then((m) => m.form),

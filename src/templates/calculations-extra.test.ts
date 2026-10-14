@@ -1000,3 +1000,160 @@ describe("cálculos de plantillas (segunda ola)", () => {
     expect(valueRightOf(wb, ev, "Resumen", "Presupuesto disponible")).toBe(34000 - 5850);
   });
 });
+
+/** Plantillas que estaban como «Próximamente» en el catálogo inicial. */
+describe("cálculos de plantillas (catálogo completo)", () => {
+  it("control-de-retenciones: tasa por concepto, estado, pendiente y resumen mensual", async () => {
+    const { wb, ev } = await buildExample("control-de-retenciones");
+    expect(
+      tableRow(wb, ev, "Retenciones", "Proveedor o cliente", "Consultores Asociados S. de R.L."),
+    ).toMatchObject({
+      Impuesto: "ISR",
+      Tasa: 0.125,
+      Retención: 2500,
+      Estado: "Enterada",
+    });
+    const pending = tableRow(wb, ev, "Retenciones", "Proveedor o cliente", "Ing. Carlos Mejía");
+    expect(pending.Retención).toBe(1000);
+    // Vence el 10 de marzo (o el siguiente día hábil)
+    const due = new Date(Date.UTC(new Date().getFullYear(), 2, 10));
+    while (due.getUTCDay() === 0 || due.getUTCDay() === 6) due.setUTCDate(due.getUTCDate() + 1);
+    expect(pending.Estado).toBe(
+      isoFromToday(0) > due.toISOString().slice(0, 10) ? "Vencida" : "Por enterar",
+    );
+    expect(
+      tableRow(wb, ev, "Retenciones", "Proveedor o cliente", "Distribuidora Nacional S.A."),
+    ).toMatchObject({
+      Retención: 1500,
+      Estado: "Con constancia",
+    });
+    expect(
+      tableRow(wb, ev, "Retenciones", "Proveedor o cliente", "Hospital Central S.A."),
+    ).toMatchObject({
+      Impuesto: "ISV",
+      Retención: 1500,
+      Estado: "Pedir constancia",
+    });
+    expect(valueRightOf(wb, ev, "Retenciones", "Retenido pendiente de enterar")).toBe(1000);
+    expect(valueRightOf(wb, ev, "Retenciones", "ISR que te retuvieron")).toBe(1500);
+    expect(valueRightOf(wb, ev, "Retenciones", "ISV que te retuvieron")).toBe(1500);
+    expect(valueRightOf(wb, ev, "Retenciones", "Constancias por pedir")).toBe(1);
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Enero")).toMatchObject({
+      "ISR retenido": 2500,
+      Enterado: 2500,
+      Pendiente: 0,
+    });
+    expect(tableRow(wb, ev, "Resumen", "Mes", "Febrero")).toMatchObject({
+      "ISR retenido": 1000,
+      Pendiente: 1000,
+      "ISR que te retuvieron": 1500,
+      "ISV que te retuvieron": 1500,
+    });
+    expect(
+      tableRow(wb, ev, "Resumen", "Concepto", "ISR honorarios y servicios profesionales"),
+    ).toMatchObject({ "Retenciones efectuadas": 3500, Registros: 2 });
+  });
+
+  it("impuesto-municipal: tramos por millar, impuesto anual, cuota y pagos", async () => {
+    const { wb, ev } = await buildExample("impuesto-municipal");
+    const sheet = "Impuesto municipal";
+    expect(valueRightOf(wb, ev, sheet, "Base para la tabla por tramos")).toBe(3_000_000);
+    expect(tableRow(wb, ev, sheet, "Desde", 10_000_000)).toMatchObject({
+      Desde: 500_000,
+      "Ingresos en el tramo": 2_500_000,
+      "Impuesto del tramo": 1000,
+    });
+    expect(valueRightOf(wb, ev, sheet, "Impuesto por tramos")).toBe(1150);
+    expect(valueRightOf(wb, ev, sheet, "Impuesto sobre productos con precio regulado")).toBe(25);
+    expect(valueRightOf(wb, ev, sheet, "IMPUESTO ANUAL")).toBe(1175);
+    expect(valueRightOf(wb, ev, sheet, "Cuota mensual del impuesto")).toBe(97.92);
+    expect(valueRightOf(wb, ev, sheet, "TOTAL A PAGAR CADA MES")).toBe(447.92);
+    expect(valueRightOf(wb, ev, sheet, "Total a pagar en el año")).toBe(6875);
+    expect(tableRow(wb, ev, "Pagos", "Mes", "Enero")).toMatchObject({
+      Cuota: 447.92,
+      Pendiente: 0,
+      Estado: "Pagado",
+    });
+    expect(tableRow(wb, ev, "Pagos", "Mes", "Diciembre").Pendiente).toBe(447.92);
+  });
+
+  it("mercaderia-en-consignacion: comisión, saldo por consignatario, existencias y consulta", async () => {
+    const { wb, ev } = await buildExample("mercaderia-en-consignacion");
+    expect(tableRow(wb, ev, "Movimientos", "Tipo", "Gorra bordada")).toMatchObject({
+      "Precio de lista": 250,
+      "Efecto en consignación (precio de lista)": 7500,
+    });
+    expect(tableRow(wb, ev, "Consignatarios", "Consignatario", "Tienda La Moda")).toMatchObject({
+      "Unidades entregadas": 30,
+      "Unidades vendidas": 11,
+      "Unidades devueltas": 2,
+      "Unidades en consignación": 17,
+      Ventas: 6150,
+      Comisión: 1230,
+      "Te debe": 4920,
+      Cobrado: 2880,
+      "Saldo por cobrar": 2040,
+      "Valor en consignación": 10450,
+    });
+    expect(tableRow(wb, ev, "Consignatarios", "Consignatario", "Boutique Estilo")).toMatchObject({
+      Ventas: 2700,
+      Comisión: 675,
+      "Saldo por cobrar": 2025,
+      "Valor en consignación": 4500,
+    });
+    expect(tableRow(wb, ev, "Productos", "Código", "CAM-01")).toMatchObject({
+      "Unidades en consignación": 10,
+      "Valor en consignación": 4500,
+      Ventas: 3600,
+    });
+    expect(valueRightOf(wb, ev, "Movimientos", "Unidades en consignación")).toBe(35);
+    expect(valueRightOf(wb, ev, "Movimientos", "Valor en consignación (precio de lista)")).toBe(
+      14950,
+    );
+    expect(valueRightOf(wb, ev, "Movimientos", "Ventas reportadas")).toBe(8850);
+    expect(valueRightOf(wb, ev, "Movimientos", "Saldo por cobrar")).toBe(4065);
+    expect(valueRightOf(wb, ev, "Movimientos", "Unidades en consignación", 1)).toBe(10);
+    expect(valueRightOf(wb, ev, "Movimientos", "Valor (precio de lista)")).toBe(4500);
+  });
+
+  it("mercaderia-en-consignacion: modo de quien recibe la mercadería", async () => {
+    const { wb, ev } = await buildExample("mercaderia-en-consignacion", { mode: "recibo" });
+    expect(tableRow(wb, ev, "Proveedores", "Proveedor", "Tienda La Moda")).toMatchObject({
+      "Unidades recibidas": 30,
+      "Le debes": 4920,
+      Pagado: 2880,
+      "Saldo por pagar": 2040,
+    });
+  });
+
+  it("costos-de-importacion-aduana: CIF, DAI, ISV, prorrateo y costo en bodega", async () => {
+    const { wb, ev } = await buildExample("costos-de-importacion-aduana", { exchangeRate: 25 });
+    expect(tableRow(wb, ev, "Importación", "Código", "TAL-01")).toMatchObject({
+      "FOB total (US$)": 3000,
+      Participación: 0.6,
+      "FOB (L)": 75_000,
+      "Flete y seguro (L)": 15_000,
+      "Valor CIF (L)": 90_000,
+      "DAI (L)": 9000,
+      "ISV (L)": 14_850,
+      "Gastos locales (L)": 7500,
+      "Costo en bodega (L)": 106_500,
+      "Costo unitario (L)": 2130,
+      "Precio sugerido (sin ISV)": 3276.92,
+    });
+    expect(tableRow(wb, ev, "Importación", "Código", "CAS-01")).toMatchObject({
+      "DAI (L)": 1500,
+      "ISV (L)": 0,
+      "Costo unitario (L)": 340,
+    });
+    expect(valueRightOf(wb, ev, "Liquidación", "TOTAL DE IMPUESTOS A PAGAR EN ADUANA")).toBe(
+      35_025,
+    );
+    expect(valueRightOf(wb, ev, "Liquidación", "Dinero total que sale de tu caja")).toBe(197_525);
+    expect(valueRightOf(wb, ev, "Liquidación", "Crédito fiscal de ISV (lo recuperas)")).toBe(
+      20_025,
+    );
+    expect(valueRightOf(wb, ev, "Liquidación", "COSTO TOTAL PUESTO EN BODEGA")).toBe(177_500);
+    expect(valueRightOf(wb, ev, "Liquidación", "Factor de importación")).toBeCloseTo(1.42, 10);
+  });
+});

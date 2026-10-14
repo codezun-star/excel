@@ -151,6 +151,81 @@ export const HN: CountryContext = {
         institution: "RAP",
       },
     ],
+
+    withholding: {
+      // TODO: VERIFICAR VALOR VIGENTE — Ley del ISR, Ley del ISV y acuerdos del SAR sobre agentes de retención
+      rules: [
+        {
+          id: "isr-honorarios",
+          tax: "income",
+          label: "ISR honorarios y servicios profesionales",
+          rate: 0.125, // TODO: VERIFICAR VALOR VIGENTE (Ley del ISR, art. 50)
+          base: "Honorarios, comisiones y servicios técnicos pagados a residentes",
+        },
+        {
+          id: "isr-pago-a-cuenta",
+          tax: "income",
+          label: "ISR 1% sobre compras (pago a cuenta)",
+          rate: 0.01, // TODO: VERIFICAR VALOR VIGENTE
+          base: "Compras de bienes y servicios a proveedores, por agentes de retención designados",
+        },
+        {
+          id: "isr-dividendos",
+          tax: "income",
+          label: "ISR dividendos y utilidades",
+          rate: 0.1, // TODO: VERIFICAR VALOR VIGENTE
+          base: "Dividendos o participaciones de utilidades distribuidas",
+        },
+        {
+          id: "isr-intereses",
+          tax: "income",
+          label: "ISR intereses y rendimientos",
+          rate: 0.1, // TODO: VERIFICAR VALOR VIGENTE
+          base: "Intereses y rendimientos financieros pagados",
+        },
+        {
+          id: "isr-no-residentes",
+          tax: "income",
+          label: "ISR pagos a no residentes",
+          rate: 0.25, // TODO: VERIFICAR VALOR VIGENTE (Ley del ISR, art. 5)
+          base: "Servicios, honorarios y regalías pagados a personas no domiciliadas",
+        },
+        {
+          id: "isv-agente",
+          tax: "sales",
+          label: "ISV retenido por agente designado",
+          rate: 0.15, // TODO: VERIFICAR VALOR VIGENTE (agentes de retención del ISV designados por el SAR)
+          base: "Valor sin impuesto de los bienes o servicios gravados",
+        },
+      ],
+      remittanceDueDay: 10, // TODO: VERIFICAR VALOR VIGENTE (entero de retenciones dentro de los 10 días del mes siguiente)
+    },
+
+    municipal: {
+      name: "Impuesto sobre Industria, Comercio y Servicios",
+      legalBasis: "Ley de Municipalidades, art. 78",
+      base: "Ingresos por ventas o servicios del año anterior",
+      // TODO: VERIFICAR VALOR VIGENTE — tabla por millar del art. 78 y el plan de arbitrios de cada municipio
+      brackets: [
+        { from: 0, to: 500_000, perThousand: 0.3 },
+        { from: 500_000, to: 10_000_000, perThousand: 0.4 },
+        { from: 10_000_000, to: 20_000_000, perThousand: 0.3 },
+        { from: 20_000_000, to: 30_000_000, perThousand: 0.2 },
+        { from: 30_000_000, to: null, perThousand: 0.15 },
+      ],
+      regulatedPricePerThousand: 0.1, // TODO: VERIFICAR VALOR VIGENTE (productos con precio controlado)
+      monthlyDueDay: 10, // TODO: VERIFICAR VALOR VIGENTE (pago mensual dentro de los primeros 10 días)
+      declarationMonth: 1, // TODO: VERIFICAR VALOR VIGENTE (declaración jurada del volumen de ventas en enero)
+    },
+
+    customs: {
+      dutyName: "DAI",
+      dutyLongName: "Derechos Arancelarios a la Importación",
+      // TODO: VERIFICAR VALOR VIGENTE — tasas del Arancel Centroamericano (SAC); la tasa exacta depende de la partida
+      dutyRates: [0, 0.05, 0.1, 0.15],
+      selectiveTaxName: "Impuesto Selectivo al Consumo",
+      valuationBasis: "CIF",
+    },
   },
 
   labor: {

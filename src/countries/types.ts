@@ -77,6 +77,58 @@ export interface IncomeTaxInfo {
   };
 }
 
+export interface WithholdingRule {
+  id: string;
+  /** "income" = impuesto sobre la renta; "sales" = impuesto sobre ventas */
+  tax: "income" | "sales";
+  /** Concepto que aparece en los desplegables de Excel */
+  label: string;
+  rate: number;
+  /** Sobre qué monto se calcula */
+  base: string;
+}
+
+export interface WithholdingInfo {
+  rules: WithholdingRule[];
+  /** Día del mes siguiente en que vence el entero de lo retenido */
+  remittanceDueDay: number;
+}
+
+/** Tramo marginal del impuesto municipal: se cobra `perThousand` por cada mil del tramo. */
+export interface MunicipalTaxBracket {
+  from: number;
+  /** null = sin límite */
+  to: number | null;
+  perThousand: number;
+}
+
+export interface MunicipalTaxInfo {
+  name: string;
+  /** Ley o norma que define la tabla */
+  legalBasis: string;
+  /** Qué ingresos se toman como base */
+  base: string;
+  brackets: MunicipalTaxBracket[];
+  /** Tasa por millar para productos con precio regulado por el Estado (null = no aplica) */
+  regulatedPricePerThousand: number | null;
+  /** Día de cada mes en que vence la cuota mensual */
+  monthlyDueDay: number;
+  /** Mes en que se presenta la declaración del volumen de ventas del año anterior */
+  declarationMonth: number;
+}
+
+export interface CustomsInfo {
+  /** Nombre corto del arancel (DAI en Centroamérica) */
+  dutyName: string;
+  dutyLongName: string;
+  /** Tasas más comunes del arancel (la tasa exacta depende de la partida) */
+  dutyRates: number[];
+  /** Nombre del impuesto selectivo al consumo que grava ciertas importaciones */
+  selectiveTaxName: string;
+  /** Base del valor en aduana ("CIF") */
+  valuationBasis: string;
+}
+
 export interface SocialSecurityItem {
   id: string;
   label: string;
@@ -189,6 +241,12 @@ export interface CountryContext {
     socialSecurity: SocialSecurityItem[];
     /** Aportes patronales adicionales (INFOP, reserva laboral, etc.) */
     employerOnly: { id: string; label: string; rate: number; institution: string }[];
+    /** Retenciones en la fuente de ISR e impuesto sobre ventas */
+    withholding: WithholdingInfo;
+    /** Impuesto municipal sobre industria, comercio y servicios */
+    municipal: MunicipalTaxInfo;
+    /** Aranceles e impuestos de importación */
+    customs: CustomsInfo;
   };
   labor: LaborRules;
   /** Datos para documentos fiscales (facturas) */

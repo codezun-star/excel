@@ -48,6 +48,9 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
   "estado-de-resultados-balance": () =>
     import("../impuestos/estado-de-resultados-balance").then((m) => m.default),
   "presupuesto-anual": () => import("../impuestos/presupuesto-anual").then((m) => m.default),
+  "control-de-retenciones": () =>
+    import("../impuestos/control-de-retenciones").then((m) => m.default),
+  "impuesto-municipal": () => import("../impuestos/impuesto-municipal").then((m) => m.default),
   "simulador-de-prestamos": () =>
     import("../finanzas-personales/simulador-de-prestamos").then((m) => m.default),
   "prestamo-de-vivienda": () =>
@@ -80,6 +83,10 @@ export const SERVER_TEMPLATES: Record<string, () => Promise<AnyTemplateDefinitio
     import("../inventario/inventario-por-lote-vencimiento").then((m) => m.default),
   "pedidos-y-entregas": () => import("../inventario/pedidos-y-entregas").then((m) => m.default),
   "ventas-por-whatsapp": () => import("../inventario/ventas-por-whatsapp").then((m) => m.default),
+  "mercaderia-en-consignacion": () =>
+    import("../inventario/mercaderia-en-consignacion").then((m) => m.default),
+  "costos-de-importacion-aduana": () =>
+    import("../inventario/costos-de-importacion-aduana").then((m) => m.default),
   pulperia: () => import("../negocios/pulperia").then((m) => m.default),
   "taller-mecanico": () => import("../negocios/taller-mecanico").then((m) => m.default),
   "barberia-salon": () => import("../negocios/barberia-salon").then((m) => m.default),
